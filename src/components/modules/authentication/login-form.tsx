@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,11 +23,11 @@ import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import * as z from "zod";
 import { useSearchParams } from "next/navigation";
-import { useSession } from "@/hooks/useSession";
 import { useSessionContext } from "@/context/SessionContext";
+import { Eye, EyeOff } from "lucide-react";
 
 const formSchema = z.object({
-  email: z.string().email("Invalid email address"),
+  email: z.email(),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
@@ -35,6 +36,7 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<typeof Card>) {
   const { refetch } = useSessionContext();
+  const [showPassword, setShowPassword] = useState(false);
   const form = useForm({
     defaultValues: {
       email: "",
@@ -70,10 +72,11 @@ export function LoginForm({
 
   const handleGoogleLogin = async () => {
     try {
-      await authClient.signIn.social({
+      const data = await authClient.signIn.social({
         provider: "google",
         callbackURL: `${process.env.NEXT_PUBLIC_APP_URL}`,
       });
+      console.log(data);
     } catch {
       toast.error("Google login Failed");
     }
@@ -138,15 +141,23 @@ export function LoginForm({
                     field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field data-invalid={invalid}>
-                      <Input
-                        id="password"
-                        type="password"
-                        placeholder="Enter your password"
-                        value={field.state.value}
-                        // required
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        className="focus-visible:ring-[#611f69]/40 dark:focus-visible:ring-[#c084fc]/40 h-10"
-                      />
+                      <div className="relative">
+                        <Input
+                          id="password"
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Enter your password"
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          className="focus-visible:ring-[#611f69]/40 dark:focus-visible:ring-[#c084fc]/40 h-10 pr-10"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
                       {invalid && (
                         <FieldError errors={field.state.meta.errors} />
                       )}
@@ -178,7 +189,7 @@ export function LoginForm({
           </Button>
           <div className="mx-auto text-center items-center mt-5">
             <a
-              href="#"
+              href="/forgot-password"
               className="text-center mx-auto text-muted-foreground hover:text-[#611f69] dark:hover:text-[#d8b4fe] transition-colors inline-block text-sm underline-offset-4 hover:underline"
             >
               Forgot your password?

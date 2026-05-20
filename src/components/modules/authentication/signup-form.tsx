@@ -44,16 +44,14 @@ export function SignupForm(props: React.ComponentProps<typeof Card>) {
       const toastId = toast.loading("Creating account...");
 
       try {
-        const { data, error } = await authClient.signUp.email({
+        const signUpPayload = {
           email: value.email,
           password: value.password,
           name: value.name,
-          callbacks: {
-            onComplete: () => {
-              // Handle signup completion
-            },
-          },
-        });
+          role: value.role,
+        };
+
+        const { error } = await authClient.signUp.email(signUpPayload);
 
         if (error) {
           toast.error(error.message, { id: toastId });

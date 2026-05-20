@@ -13,6 +13,24 @@ export interface Category {
   image?: string;
 }
 
+export interface Course {
+  id: string;
+  title: string;
+  description?: string | null;
+  image?: string | null;
+  isPopular: boolean;
+  categoryId: string;
+  category: Category;
+  createdBy: {
+    id: string;
+    name: string;
+    image?: string | null;
+    role: UserRole;
+  };
+  createdAt: string;
+  updatedAt?: string;
+}
+
 export interface Mentor {
   id: string;
   bio: string;
@@ -29,6 +47,7 @@ export interface Mentor {
 
 export interface AvailabilitySlot {
   id: string;
+  dayOfWeek: number; // 0–6 (Sunday–Saturday)
   day: string; // e.g. "Monday"
   startTime: string; // "09:00"
   endTime: string; // "11:00"

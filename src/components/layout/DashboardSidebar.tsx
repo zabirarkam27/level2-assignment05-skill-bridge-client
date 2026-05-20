@@ -35,6 +35,7 @@ function getNavItems(role?: string): NavItem[] {
       { title: "My Sessions", href: "/tutor/sessions", icon: <CalendarDays className="w-4 h-4" /> },
       { title: "Availability", href: "/tutor/availability", icon: <Clock className="w-4 h-4" /> },
       { title: "Reviews", href: "/tutor/reviews", icon: <Star className="w-4 h-4" /> },
+      { title: "My Courses", href: "/tutor/courses", icon: <BookOpen className="w-4 h-4" /> },
       { title: "Profile", href: "/tutor/profile", icon: <User className="w-4 h-4" /> },
     ];
   }
@@ -45,6 +46,7 @@ function getNavItems(role?: string): NavItem[] {
       { title: "Tutor Requests", href: "/admin/tutors", icon: <UserCheck className="w-4 h-4" /> },
       { title: "Bookings", href: "/admin/bookings", icon: <BookOpen className="w-4 h-4" /> },
       { title: "Categories", href: "/admin/categories", icon: <FolderOpen className="w-4 h-4" /> },
+      { title: "Courses", href: "/admin/courses", icon: <BookOpen className="w-4 h-4" /> },
     ];
   }
   // STUDENT default

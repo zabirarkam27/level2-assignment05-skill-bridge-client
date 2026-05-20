@@ -5,7 +5,7 @@ import { Booking, BookingStatus } from "@/types/routes.type";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { CalendarDays, Clock, CheckCircle2 } from "lucide-react";
+import { CalendarDays, Clock, CheckCircle2, Check } from "lucide-react";
 import { motion } from "framer-motion";
 
 const statusVariant: Record<BookingStatus, "default" | "warning" | "success" | "destructive"> = {
@@ -18,7 +18,7 @@ const statusVariant: Record<BookingStatus, "default" | "warning" | "success" | "
 export default function TutorSessionsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
-  const [completing, setCompleting] = useState<string | null>(null);
+  const [actionId, setActionId] = useState<string | null>(null);
   const [filter, setFilter] = useState<BookingStatus | "ALL">("ALL");
 
   const fetchBookings = async () => {
@@ -38,26 +38,38 @@ export default function TutorSessionsPage() {
 
   useEffect(() => { fetchBookings(); }, []);
 
-  const markComplete = async (id: string) => {
-    setCompleting(id);
+  const updateStatus = async (id: string, status: "CONFIRMED" | "COMPLETED") => {
+    setActionId(id);
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/bookings/${id}/complete`,
-        {
-          method: "PATCH",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-      if (!res.ok) throw new Error();
+      const endpoint =
+        status === "COMPLETED"
+          ? `${process.env.NEXT_PUBLIC_API_URL}/bookings/${id}/complete`
+          : `${process.env.NEXT_PUBLIC_API_URL}/bookings/${id}/status`;
+
+      const res = await fetch(endpoint, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: status === "CONFIRMED" ? JSON.stringify({ status }) : undefined,
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || "Request failed");
+      }
       setBookings((b) =>
-        b.map((bk) => (bk.id === id ? { ...bk, status: "COMPLETED" } : bk)),
+        b.map((bk) => (bk.id === id ? { ...bk, status } : bk)),
       );
-      toast.success("Session marked as completed!");
-    } catch {
-      toast.error("Failed to mark complete");
+      toast.success(
+        status === "CONFIRMED"
+          ? "Booking confirmed!"
+          : "Session marked as completed!",
+      );
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Action failed";
+      toast.error(message);
     } finally {
-      setCompleting(null);
+      setActionId(null);
     }
   };
 
@@ -78,7 +90,7 @@ export default function TutorSessionsPage() {
 
       {/* Filter */}
       <div className="flex gap-2 mb-5 flex-wrap">
-        {(["ALL", "CONFIRMED", "COMPLETED", "CANCELLED"] as const).map((s) => (
+        {(["ALL", "PENDING", "CONFIRMED", "COMPLETED", "CANCELLED"] as const).map((s) => (
           <button
             key={s}
             onClick={() => setFilter(s)}
@@ -134,15 +146,26 @@ export default function TutorSessionsPage() {
               </div>
               <div className="flex flex-col items-end gap-2">
                 <Badge variant={statusVariant[b.status]}>{b.status}</Badge>
+                {b.status === "PENDING" && (
+                  <Button
+                    size="sm"
+                    disabled={actionId === b.id}
+                    onClick={() => updateStatus(b.id, "CONFIRMED")}
+                    className="text-xs bg-[#611f69] text-white hover:bg-[#4a174f] dark:bg-[#c084fc] dark:text-black h-7 px-3"
+                  >
+                    <Check className="w-3.5 h-3.5 mr-1" />
+                    {actionId === b.id ? "..." : "Confirm"}
+                  </Button>
+                )}
                 {b.status === "CONFIRMED" && (
                   <Button
                     size="sm"
-                    disabled={completing === b.id}
-                    onClick={() => markComplete(b.id)}
+                    disabled={actionId === b.id}
+                    onClick={() => updateStatus(b.id, "COMPLETED")}
                     className="text-xs bg-green-600 text-white hover:bg-green-700 h-7 px-3"
                   >
                     <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
-                    {completing === b.id ? "..." : "Complete"}
+                    {actionId === b.id ? "..." : "Complete"}
                   </Button>
                 )}
               </div>

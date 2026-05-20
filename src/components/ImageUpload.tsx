@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Camera, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { getAvatarUrl } from "@/lib/avatar";
+import { uploadOptimizedImage } from "@/lib/upload-image";
 
 interface ImageUploadProps {
   currentImage: string | null | undefined;
@@ -37,25 +38,9 @@ export default function ImageUpload({
   const uploadFile = async (file: File) => {
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append("image", file);
-
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/upload/image`,
-        {
-          method: "POST",
-          credentials: "include",
-          body: formData,
-        },
-      );
-
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.message || "Upload failed");
-      }
-
-      onUploadComplete(data.data.url);
-      toast.success("Image uploaded");
+      const result = await uploadOptimizedImage(file, "avatar");
+      onUploadComplete(result.url);
+      toast.success(`Photo optimized (${result.format.toUpperCase()})`);
     } catch (error: any) {
       toast.error(error.message || "Failed to upload image");
       setPreview(null);
@@ -80,7 +65,7 @@ export default function ImageUpload({
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp,image/gif"
+        accept="image/jpeg,image/png,image/webp,image/gif,image/avif,image/bmp,image/heic"
         className="hidden"
         title="Upload avatar image"
         aria-label="Upload avatar image"

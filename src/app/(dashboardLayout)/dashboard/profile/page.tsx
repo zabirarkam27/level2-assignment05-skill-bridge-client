@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { User, Save } from "lucide-react";
 import ImageUpload from "@/components/ImageUpload";
+import ChangePassword from "@/components/ChangePassword";
 
 export default function StudentProfilePage() {
   const { user, refetch } = useSessionContext();
@@ -103,6 +104,8 @@ export default function StudentProfilePage() {
           )}
         </Button>
       </div>
+
+      <ChangePassword />
     </div>
   );
 }

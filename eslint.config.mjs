@@ -15,8 +15,9 @@ const eslintConfig = defineConfig([
   ]),
   {
     rules: {
+      "@typescript-eslint/no-explicit-any": "off",
       "react/no-children-prop": [
-        true,
+        "error",
         {
           allowFunctions: true,
         },

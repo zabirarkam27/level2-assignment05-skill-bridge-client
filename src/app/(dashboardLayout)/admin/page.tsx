@@ -155,6 +155,7 @@ export default function AdminDashboardPage() {
             { label: "Manage Users", href: "/admin/users", icon: <Users className="w-4 h-4" /> },
             { label: "View Bookings", href: "/admin/bookings", icon: <BookOpen className="w-4 h-4" /> },
             { label: "Manage Categories", href: "/admin/categories", icon: <FolderOpen className="w-4 h-4" /> },
+            { label: "Manage Courses", href: "/admin/courses", icon: <BookOpen className="w-4 h-4" /> },
           ].map((a) => (
             <a
               key={a.href}

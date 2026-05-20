@@ -153,6 +153,7 @@ export default function AdminUsersPage() {
       u.email.toLowerCase().includes(search.toLowerCase()),
   );
 
+  console.log(users);
   return (
     <>
       <div>
@@ -217,7 +218,7 @@ export default function AdminUsersPage() {
                 >
                   {/* Avatar */}
                   <div className="w-10 h-10 rounded-full overflow-hidden shrink-0">
-                    <Image src={getAvatarUrl(user.image)} alt={user.name} width={40} height={40} className="object-cover w-full h-full" />
+                    <Image src={user.image||"/avatar.svg"} alt={user.name} width={40} height={40} className="object-cover w-full h-full" />
                   </div>
 
                   {/* Info */}

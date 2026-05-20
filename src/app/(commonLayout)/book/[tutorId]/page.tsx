@@ -73,6 +73,7 @@ export default function BookPage() {
             setAvailability(
               (Array.isArray(d.data) ? d.data : []).map((s: any) => ({
                 id: s.id,
+                dayOfWeek: s.dayOfWeek,
                 day: DAY_NAMES[s.dayOfWeek] ?? "Unknown",
                 startTime: s.startTime,
                 endTime: s.endTime,
@@ -100,32 +101,39 @@ export default function BookPage() {
     };
   }, [tutorId, user, router]);
 
+  const dateMatchesSlot = (dateStr: string, dayOfWeek: number) => {
+    const [y, m, d] = dateStr.split("-").map(Number);
+    return new Date(y, m - 1, d).getDay() === dayOfWeek;
+  };
+
   const handleBook = async () => {
     if (!selectedSlot || !date) {
       toast.error("Please select an availability slot and date");
       return;
     }
+    if (!dateMatchesSlot(date, selectedSlot.dayOfWeek)) {
+      toast.error(
+        `Please pick a ${selectedSlot.day} for this time slot`,
+      );
+      return;
+    }
     setSubmitting(true);
     try {
-      const dateTime = new Date(
-        `${date}T${selectedSlot.startTime}:00`,
-      ).toISOString();
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bookings`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           tutorId,
-          dateTime,
-          ...(subject && { subject }),
-          ...(note && { note }),
+          availabilityId: selectedSlot.id,
+          date,
         }),
       });
       if (!res.ok) {
         const err = await res.json();
         throw new Error(err.message || "Failed");
       }
-      toast.success("Session booked successfully! 🎉");
+      toast.success("Booking request sent! Your tutor will confirm the session.");
       router.push("/dashboard/bookings");
     } catch (err: any) {
       toast.error(err.message || "Booking failed");
@@ -287,7 +295,7 @@ export default function BookPage() {
           disabled={submitting || !selectedSlot || !date}
           className="w-full bg-[#611f69] text-white hover:bg-[#4a174f] dark:bg-[#c084fc] dark:text-black dark:hover:bg-[#d8b4fe] py-5 text-base"
         >
-          {submitting ? "Booking..." : "Confirm Booking"}
+          {submitting ? "Submitting..." : "Request Booking"}
         </Button>
       </motion.div>
     </div>
