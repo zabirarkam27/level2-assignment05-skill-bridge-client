@@ -9,6 +9,7 @@ import { Star, BookOpen, Search, SlidersHorizontal, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { getAvatarUrl } from "@/lib/avatar";
+import { fetchPublicApi } from "@/lib/public-api";
 
 // MentorCard
 
@@ -161,9 +162,7 @@ export default function AllMentors({ limit }: AllMentorsProps) {
         if (params?.minRating) query.set("minRating", params.minRating);
         if (params?.categoryId) query.set("categoryId", params.categoryId);
         const qs = query.toString();
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/mentors${qs ? `?${qs}` : ""}`,
-        );
+        const res = await fetchPublicApi(`/mentors${qs ? `?${qs}` : ""}`);
         if (!res.ok) throw new Error("Failed");
         const data = await res.json();
         setMentors(Array.isArray(data.data) ? data.data : []);
@@ -182,7 +181,7 @@ export default function AllMentors({ limit }: AllMentorsProps) {
 
   useEffect(() => {
     if (!showFilterUI) return;
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`)
+    fetchPublicApi("/categories")
       .then((r) => r.json())
       .then((d) => setCategories(Array.isArray(d.data) ? d.data : []))
       .catch(() => {});

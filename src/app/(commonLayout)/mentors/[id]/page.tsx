@@ -7,10 +7,8 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import {
   Star,
-  MapPin,
   BookOpen,
   Clock,
-  DollarSign,
   MessageSquare,
   User,
   CalendarDays,
@@ -112,6 +110,7 @@ export default function MentorDetailPage() {
     reviews.length > 0
       ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1)
       : "—";
+  const mentorCourses = mentor?.user.assignedCourses ?? mentor?.courses ?? [];
 
   if (loading) {
     return (
@@ -214,7 +213,13 @@ export default function MentorDetailPage() {
             {/* CTA */}
             <div className="mt-5">
               {user ? (
-                <Link href={`/book/${id}`}>
+                <Link
+                  href={
+                    mentorCourses.length === 1
+                      ? `/book/${id}?courseId=${mentorCourses[0].id}`
+                      : `/book/${id}`
+                  }
+                >
                   <Button className="bg-[#611f69] text-white hover:bg-[#4a174f] dark:bg-[#c084fc] dark:text-black dark:hover:bg-[#d8b4fe]">
                     <CalendarDays className="w-4 h-4 mr-2" /> Book a Session
                   </Button>
@@ -230,6 +235,59 @@ export default function MentorDetailPage() {
           </div>
         </div>
       </motion.div>
+
+      <div className="mb-6 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+        <h2 className="mb-4 flex items-center gap-2 font-semibold text-gray-900 dark:text-white">
+          <BookOpen className="h-4 w-4 text-[#611f69] dark:text-[#c084fc]" />
+          Courses by {mentor.user.name}
+        </h2>
+
+        {mentorCourses.length === 0 ? (
+          <p className="text-sm text-gray-400">
+            No courses are assigned to this mentor yet.
+          </p>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2">
+            {mentorCourses.map((course) => (
+              <div
+                key={course.id}
+                className="rounded-xl border border-gray-100 p-4 transition-colors hover:border-[#611f69]/40 dark:border-gray-700"
+              >
+                <p className="text-xs font-medium text-[#611f69] dark:text-[#c084fc]">
+                  {course.category?.name || "Course"}
+                </p>
+                <h3 className="mt-1 text-sm font-semibold text-gray-900 dark:text-white">
+                  {course.title}
+                </h3>
+                {course.description && (
+                  <p className="mt-2 line-clamp-2 text-xs leading-5 text-gray-500 dark:text-gray-400">
+                    {course.description}
+                  </p>
+                )}
+                <div className="mt-4 flex gap-2">
+                  <Button asChild size="sm" variant="outline" className="h-8 text-xs">
+                    <Link href={`/courses/${course.id}`}>Details</Link>
+                  </Button>
+                  <Button
+                    asChild={!!user}
+                    size="sm"
+                    disabled={!user}
+                    className="h-8 bg-[#611f69] text-xs text-white hover:bg-[#4a174f] dark:bg-[#c084fc] dark:text-black"
+                  >
+                    {user ? (
+                      <Link href={`/book/${id}?courseId=${course.id}`}>
+                        Book This Course
+                      </Link>
+                    ) : (
+                      "Login to Book"
+                    )}
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Availability */}

@@ -2,15 +2,16 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Category, Course } from "@/types/routes.type";
+import { fetchPublicApi } from "@/lib/public-api";
 
 export const ALL_CATEGORIES_TAB_ID = "all";
-
-const API = process.env.NEXT_PUBLIC_API_URL;
 
 export function useCategoryCourses() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
-  const [activeCategoryId, setActiveCategoryId] = useState(ALL_CATEGORIES_TAB_ID);
+  const [activeCategoryId, setActiveCategoryId] = useState(
+    ALL_CATEGORIES_TAB_ID,
+  );
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [coursesLoading, setCoursesLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,8 +23,8 @@ export function useCategoryCourses() {
 
     try {
       const [categoriesRes, coursesRes] = await Promise.all([
-        fetch(`${API}/categories`),
-        fetch(`${API}/courses`),
+        fetchPublicApi("/categories"),
+        fetchPublicApi("/courses"),
       ]);
 
       const categoriesJson = await categoriesRes.json();
@@ -35,7 +36,9 @@ export function useCategoryCourses() {
           : [],
       );
       setCourses(
-        coursesRes.ok && Array.isArray(coursesJson.data) ? coursesJson.data : [],
+        coursesRes.ok && Array.isArray(coursesJson.data)
+          ? coursesJson.data
+          : [],
       );
 
       if (!categoriesRes.ok || !coursesRes.ok) {

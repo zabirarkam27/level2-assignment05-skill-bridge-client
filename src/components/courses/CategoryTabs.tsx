@@ -33,7 +33,11 @@ export function CategoryTabs({
   loading = false,
 }: CategoryTabsProps) {
   const tabs = [
-    { id: ALL_CATEGORIES_TAB_ID, name: "All", image: null as string | null | undefined },
+    {
+      id: ALL_CATEGORIES_TAB_ID,
+      name: "All",
+      image: null as string | null | undefined,
+    },
     ...categories.map((c) => ({
       id: c.id,
       name: c.name,

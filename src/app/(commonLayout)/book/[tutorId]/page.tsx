@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import type { Mentor, AvailabilitySlot } from "@/types/routes.type";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import type { Mentor, AvailabilitySlot, Course } from "@/types/routes.type";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import Image from "next/image";
-import { CalendarDays, Clock, User, ArrowLeft, BookOpen } from "lucide-react";
+import { CalendarDays, Clock, ArrowLeft, BookOpen, Info } from "lucide-react";
 import { getAvatarUrl } from "@/lib/avatar";
 import { useSessionContext } from "@/context/SessionContext";
 import { motion } from "framer-motion";
@@ -15,9 +15,12 @@ import { motion } from "framer-motion";
 export default function BookPage() {
   const { tutorId } = useParams<{ tutorId: string }>();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const requestedCourseId = searchParams.get("courseId") || "";
   const { user } = useSessionContext();
 
   const [mentor, setMentor] = useState<Mentor | null>(null);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [availability, setAvailability] = useState<AvailabilitySlot[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -26,7 +29,7 @@ export default function BookPage() {
     null,
   );
   const [date, setDate] = useState("");
-  const [subject, setSubject] = useState("");
+  const [selectedCourseId, setSelectedCourseId] = useState(requestedCourseId);
   const [note, setNote] = useState("");
 
   useEffect(() => {
@@ -55,7 +58,13 @@ export default function BookPage() {
         if (mRes.status === "fulfilled") {
           const d = await mRes.value.json();
           if (isMounted) {
-            setMentor(d.data || null);
+            const mentorData = d.data || null;
+            const assignedCourses = mentorData?.user?.assignedCourses ?? mentorData?.courses ?? [];
+            setMentor(mentorData);
+            setCourses(assignedCourses);
+            setSelectedCourseId((current) =>
+              current || (assignedCourses.length === 1 ? assignedCourses[0].id : ""),
+            );
           }
         }
         if (aRes.status === "fulfilled") {
@@ -106,7 +115,26 @@ export default function BookPage() {
     return new Date(y, m - 1, d).getDay() === dayOfWeek;
   };
 
+  const selectedCourse = courses.find((course) => course.id === selectedCourseId);
+
   const handleBook = async () => {
+    if (courses.length === 0) {
+      toast.info("This mentor does not have an assigned course available for booking yet.");
+      return;
+    }
+
+    if (availability.length === 0) {
+      toast.info(
+        "This mentor is currently unavailable for booking. Please check back later.",
+      );
+      return;
+    }
+
+    if (!selectedCourseId) {
+      toast.error("Please select the course you want to book for");
+      return;
+    }
+
     if (!selectedSlot || !date) {
       toast.error("Please select an availability slot and date");
       return;
@@ -125,6 +153,7 @@ export default function BookPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           tutorId,
+          courseId: selectedCourseId,
           availabilityId: selectedSlot.id,
           date,
         }),
@@ -197,6 +226,14 @@ export default function BookPage() {
           <p className="text-sm font-semibold text-[#611f69] dark:text-[#c084fc] mt-1">
             ৳ {mentor.price}/hr
           </p>
+          {selectedCourse && (
+            <p className="mt-1 text-xs text-gray-500">
+              Booking for:{" "}
+              <span className="font-medium text-gray-700 dark:text-gray-300">
+                {selectedCourse.title}
+              </span>
+            </p>
+          )}
         </div>
       </motion.div>
 
@@ -207,6 +244,32 @@ export default function BookPage() {
         transition={{ delay: 0.1 }}
         className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6 shadow-sm space-y-5"
       >
+        <div>
+          <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Course *
+          </label>
+          {courses.length === 0 ? (
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700 dark:border-amber-900/40 dark:bg-amber-900/20 dark:text-amber-200">
+              No course is assigned to this mentor yet. Booking will be available
+              once an admin or mentor assigns a course.
+            </div>
+          ) : (
+            <select
+              value={selectedCourseId}
+              onChange={(e) => setSelectedCourseId(e.target.value)}
+              title="Select course for this session"
+              className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#611f69]/40 dark:focus:ring-[#c084fc]/40"
+            >
+              <option value="">Select course</option>
+              {courses.map((course) => (
+                <option key={course.id} value={course.id}>
+                  {course.title}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+
         {/* Availability slots */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-1.5">
@@ -214,9 +277,26 @@ export default function BookPage() {
             Select Time Slot
           </label>
           {availability.length === 0 ? (
-            <p className="text-sm text-gray-400 py-3">
-              No available slots. Try another tutor.
-            </p>
+            <div className="rounded-xl border border-[#611f69]/15 bg-[#611f69]/5 p-4 text-sm text-gray-600 dark:border-[#c084fc]/20 dark:bg-[#c084fc]/10 dark:text-gray-300">
+              <div className="flex items-start gap-3">
+                <Info className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#611f69] dark:text-[#c084fc]" />
+                <div>
+                  <p className="font-medium text-gray-900 dark:text-white">
+                    This mentor is currently unavailable for booking.
+                  </p>
+                  <p className="mt-1 leading-6">
+                    We sincerely apologize for the inconvenience. At the
+                    moment, no session slots have been published by this tutor.
+                    Our team is coordinating with the mentor to update their
+                    availability as soon as possible.
+                  </p>
+                  <p className="mt-2 leading-6">
+                    Please check back later. New booking schedules will appear
+                    once they become available.
+                  </p>
+                </div>
+              </div>
+            </div>
           ) : (
             <div className="grid grid-cols-2 gap-2">
               {availability.map((slot) => (
@@ -255,28 +335,6 @@ export default function BookPage() {
           />
         </div>
 
-        {/* Subject */}
-        {mentor.subjects.length > 0 && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Subject
-            </label>
-            <select
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              title="Select a subject"
-              className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#611f69]/40 dark:focus:ring-[#c084fc]/40"
-            >
-              <option value="">Select subject</option>
-              {mentor.subjects.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-
         {/* Note */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -292,10 +350,21 @@ export default function BookPage() {
 
         <Button
           onClick={handleBook}
-          disabled={submitting || !selectedSlot || !date}
+          disabled={
+            submitting ||
+            courses.length === 0 ||
+            availability.length === 0 ||
+            !selectedCourseId ||
+            !selectedSlot ||
+            !date
+          }
           className="w-full bg-[#611f69] text-white hover:bg-[#4a174f] dark:bg-[#c084fc] dark:text-black dark:hover:bg-[#d8b4fe] py-5 text-base"
         >
-          {submitting ? "Submitting..." : "Request Booking"}
+          {courses.length === 0 || availability.length === 0
+            ? "Booking Unavailable"
+            : submitting
+              ? "Submitting..."
+              : "Request Booking"}
         </Button>
       </motion.div>
     </div>

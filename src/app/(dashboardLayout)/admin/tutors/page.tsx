@@ -28,13 +28,25 @@ import {
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { getAvatarUrl } from "@/lib/avatar";
+import CategorySubjectPicker from "@/components/CategorySubjectPicker";
+import ConfirmActionDialog from "@/components/ConfirmActionDialog";
 
-const emptyForm = { name: "", email: "", bio: "", subjects: "", price: "" };
+const emptyForm = {
+  name: "",
+  email: "",
+  bio: "",
+  subjects: [] as string[],
+  price: "",
+};
 
 export default function AdminTutorRequestsPage() {
   const [tutors, setTutors] = useState<AppUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
+  const [pendingAction, setPendingAction] = useState<{
+    type: "approve" | "reject";
+    tutor: AppUser;
+  } | null>(null);
 
   // create dialog
   const [createOpen, setCreateOpen] = useState(false);
@@ -71,6 +83,7 @@ export default function AdminTutorRequestsPage() {
       );
       if (!res.ok) throw new Error();
       setTutors((prev) => prev.filter((t) => t.id !== userId));
+      setPendingAction(null);
       toast.success("Tutor approved successfully");
     } catch {
       toast.error("Failed to approve tutor");
@@ -88,6 +101,7 @@ export default function AdminTutorRequestsPage() {
       );
       if (!res.ok) throw new Error();
       setTutors((prev) => prev.filter((t) => t.id !== userId));
+      setPendingAction(null);
       toast.success("Tutor application rejected");
     } catch {
       toast.error("Failed to reject application");
@@ -97,7 +111,7 @@ export default function AdminTutorRequestsPage() {
   };
 
   const handleCreate = async () => {
-    if (!form.name || !form.email || !form.bio || !form.subjects || !form.price) {
+    if (!form.name || !form.email || !form.bio || form.subjects.length === 0 || !form.price) {
       toast.error("Please fill in all fields");
       return;
     }
@@ -113,7 +127,7 @@ export default function AdminTutorRequestsPage() {
             name: form.name,
             email: form.email,
             bio: form.bio,
-            subjects: form.subjects.split(",").map((s) => s.trim()).filter(Boolean),
+            subjects: form.subjects,
             price: Number(form.price),
           }),
         },
@@ -123,8 +137,8 @@ export default function AdminTutorRequestsPage() {
       setCreateOpen(false);
       setForm(emptyForm);
       setGeneratedPassword(data.data.generatedPassword);
-    } catch (err: any) {
-      toast.error(err.message || "Failed to create tutor");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed to create tutor");
     } finally {
       setCreating(false);
     }
@@ -238,7 +252,9 @@ export default function AdminTutorRequestsPage() {
                   <Button
                     size="sm"
                     disabled={updating === tutor.id}
-                    onClick={() => handleApprove(tutor.id)}
+                    onClick={() =>
+                      setPendingAction({ type: "approve", tutor })
+                    }
                     className="h-8 text-xs bg-green-600 hover:bg-green-700 text-white"
                   >
                     {updating === tutor.id ? "…" : <><UserCheck className="w-3.5 h-3.5 mr-1" />Approve</>}
@@ -247,7 +263,7 @@ export default function AdminTutorRequestsPage() {
                     size="sm"
                     variant="outline"
                     disabled={updating === tutor.id}
-                    onClick={() => handleReject(tutor.id)}
+                    onClick={() => setPendingAction({ type: "reject", tutor })}
                     className="h-8 text-xs border-red-400 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
                   >
                     {updating === tutor.id ? "…" : <><UserX className="w-3.5 h-3.5 mr-1" />Reject</>}
@@ -302,14 +318,10 @@ export default function AdminTutorRequestsPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Subjects (comma separated)</label>
-                <Input
-                  placeholder="React, Node.js, Design"
-                  value={form.subjects}
-                  onChange={(e) => setForm((f) => ({ ...f, subjects: e.target.value }))}
-                />
-              </div>
+              <CategorySubjectPicker
+                value={form.subjects}
+                onChange={(subjects) => setForm((f) => ({ ...f, subjects }))}
+              />
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Hourly Price ($)</label>
                 <Input
@@ -329,7 +341,7 @@ export default function AdminTutorRequestsPage() {
             </Button>
             <Button
               type="button"
-              disabled={creating || !form.name || !form.email || !form.bio || !form.subjects || !form.price}
+              disabled={creating || !form.name || !form.email || !form.bio || form.subjects.length === 0 || !form.price}
               onClick={handleCreate}
               className="bg-[#611f69] hover:bg-[#4a174f] text-white dark:bg-[#c084fc] dark:text-black"
             >
@@ -338,6 +350,34 @@ export default function AdminTutorRequestsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <ConfirmActionDialog
+        open={!!pendingAction}
+        onOpenChange={(open) => !open && setPendingAction(null)}
+        title={
+          pendingAction?.type === "approve"
+            ? "Approve tutor application?"
+            : "Reject tutor application?"
+        }
+        description={
+          <>
+            {pendingAction?.type === "approve" ? "Approve" : "Reject"}{" "}
+            <strong>{pendingAction?.tutor.name}</strong>&apos;s tutor
+            application?
+          </>
+        }
+        confirmText={pendingAction?.type === "approve" ? "Approve" : "Reject"}
+        danger={pendingAction?.type === "reject"}
+        loading={!!pendingAction && updating === pendingAction.tutor.id}
+        onConfirm={() => {
+          if (!pendingAction) return;
+          if (pendingAction.type === "approve") {
+            handleApprove(pendingAction.tutor.id);
+          } else {
+            handleReject(pendingAction.tutor.id);
+          }
+        }}
+      />
 
       {/* Generated Password Dialog */}
       <Dialog open={!!generatedPassword} onOpenChange={() => setGeneratedPassword(null)}>

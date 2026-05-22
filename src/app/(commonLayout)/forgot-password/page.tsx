@@ -66,11 +66,15 @@ export default function ForgotPasswordPage() {
             <CardContent className="flex flex-col items-center gap-4 py-6">
               <CheckCircle className="w-16 h-16 text-green-500" />
               <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
-                A reset link has been sent to <strong>{email}</strong>. Please check your inbox and spam folder.
+                A reset link has been sent to <strong>{email}</strong>. Please
+                check your inbox and spam folder.
               </p>
               <Button
                 variant="outline"
-                onClick={() => { setSent(false); setEmail(""); }}
+                onClick={() => {
+                  setSent(false);
+                  setEmail("");
+                }}
                 className="mt-2"
               >
                 Send again

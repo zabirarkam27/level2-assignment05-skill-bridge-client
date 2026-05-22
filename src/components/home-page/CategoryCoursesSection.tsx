@@ -37,7 +37,8 @@ export default function CategoryCoursesSection() {
               Browse by Category
             </h2>
             <p className="mt-3 max-w-xl text-lg text-gray-600 dark:text-gray-300">
-              Explore courses across every field — switch tabs to filter instantly.
+              Explore courses across every field — switch tabs to filter
+              instantly.
             </p>
           </div>
           <button
@@ -62,12 +63,14 @@ export default function CategoryCoursesSection() {
           <p className="mt-6 text-center text-sm text-red-500">{error}</p>
         )}
 
-        <CourseGrid
-          courses={courses}
-          loading={isInitialLoading}
-          emptyMessage={emptyMessage}
-          filterKey={activeCategoryId}
-        />
+        <div className="mt-10">
+          <CourseGrid
+            courses={courses}
+            loading={isInitialLoading}
+            emptyMessage={emptyMessage}
+            filterKey={activeCategoryId}
+          />
+        </div>
       </motion.div>
     </section>
   );

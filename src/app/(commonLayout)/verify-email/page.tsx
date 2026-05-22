@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, CheckCircle, XCircle } from "lucide-react";
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
   const router = useRouter();
   const params = useSearchParams();
   const token = params.get("token");
@@ -32,12 +32,15 @@ export default function VerifyEmailPage() {
           throw new Error(error.message);
         }
 
+        // Verification successful - autoSignInAfterVerification should have logged user in
         setSuccess(true);
         setTimeout(() => {
-        router.replace("/dashboard");
+          // Check if user is logged in based on role
+          // Students go to dashboard, tutors go to tutor dashboard
+          // For now, redirect to dashboard and let the dashboard redirect based on role
+          router.replace("/dashboard");
         }, 1500);
-      } catch (error: unknown) {
-        console.error("Verification failed:", error);
+      } catch {
         setTimeout(() => {
           router.replace("/login?verified=false");
         }, 2000);
@@ -71,7 +74,8 @@ export default function VerifyEmailPage() {
                   Email Verified!
                 </h2>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Your email has been verified successfully. You&apos;ll be redirected to login...
+                  Your email has been verified successfully. You&apos;ll be
+                  redirected to login...
                 </p>
               </>
             ) : (
@@ -89,5 +93,13 @@ export default function VerifyEmailPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-svh items-center justify-center text-sm text-gray-500">Loading...</div>}>
+      <VerifyEmailContent />
+    </Suspense>
   );
 }

@@ -12,19 +12,16 @@ export function useLogout() {
         {
           method: "POST",
           credentials: "include",
-        }
+        },
       );
 
-      
       if (res.ok) {
         refetch?.();
-        router.push("/login"); // ✅ redirect
-        router.refresh();      // optional
-      } else {
-        console.error("Logout failed");
+        router.push("/login");
+        router.refresh();
       }
-    } catch (err) {
-      console.error("Logout error:", err);
+    } catch {
+      router.push("/login");
     }
   };
 

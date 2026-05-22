@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { User, Save, Plus, X, DollarSign } from "lucide-react";
+import { User, Save, DollarSign } from "lucide-react";
 import ImageUpload from "@/components/ImageUpload";
 import ChangePassword from "@/components/ChangePassword";
+import CategorySubjectPicker from "@/components/CategorySubjectPicker";
 
 interface TutorProfile {
   bio: string;
@@ -23,7 +24,6 @@ export default function TutorProfilePage() {
     price: 0,
     image: "",
   });
-  const [newSubject, setNewSubject] = useState("");
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -51,18 +51,6 @@ export default function TutorProfilePage() {
     };
     fetchProfile();
   }, []);
-
-  const addSubject = () => {
-    const s = newSubject.trim();
-    if (s && !profile.subjects.includes(s)) {
-      setProfile((p) => ({ ...p, subjects: [...p.subjects, s] }));
-      setNewSubject("");
-    }
-  };
-
-  const removeSubject = (s: string) => {
-    setProfile((p) => ({ ...p, subjects: p.subjects.filter((x) => x !== s) }));
-  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -152,44 +140,10 @@ export default function TutorProfilePage() {
         </div>
 
         {/* Subjects */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-            Subjects
-          </label>
-          <div className="flex gap-2 mb-2">
-            <Input
-              value={newSubject}
-              onChange={(e) => setNewSubject(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addSubject())}
-              placeholder="Add subject (press Enter)"
-              className="flex-1 text-sm"
-            />
-            <Button
-              type="button"
-              onClick={addSubject}
-              size="sm"
-              className="bg-[#611f69] text-white hover:bg-[#4a174f] dark:bg-[#c084fc] dark:text-black"
-            >
-              <Plus className="w-4 h-4" />
-            </Button>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {profile.subjects.map((s) => (
-              <span
-                key={s}
-                className="flex items-center gap-1 px-3 py-1 rounded-full text-xs bg-[#611f69]/10 text-[#611f69] dark:bg-[#c084fc]/20 dark:text-[#e9d5ff]"
-              >
-                {s}
-                <button type="button" onClick={() => removeSubject(s)} className="ml-1 hover:text-red-500" title="Remove subject">
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            ))}
-            {profile.subjects.length === 0 && (
-              <p className="text-xs text-gray-400">No subjects added yet</p>
-            )}
-          </div>
-        </div>
+        <CategorySubjectPicker
+          value={profile.subjects}
+          onChange={(subjects) => setProfile((p) => ({ ...p, subjects }))}
+        />
 
         <Button
           onClick={handleSave}

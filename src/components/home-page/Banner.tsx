@@ -1,5 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export default function HomeBanner() {
@@ -52,18 +53,21 @@ export default function HomeBanner() {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row"
         >
-          <Button size="lg"
+          <Button
+            asChild
+            size="lg"
             className="rounded-2xl bg-gray-900 dark:bg-gray-100 dark:text-gray-900 px-10 py-6 text-base text-white shadow-lg transition transform duration-200 hover:scale-105 hover:bg-gray-800 dark:hover:bg-gray-200"
           >
-            <a href="/sign-up" > Get Started</a>
+            <Link href="/sign-up">Get Started</Link>
           </Button>
 
           <Button
+            asChild
             size="lg"
             variant="outline"
             className="rounded-2xl border-gray-400 dark:border-gray-300 px-10 py-6 text-base text-gray-700 dark:text-gray-300 transition transform duration-200 hover:bg-gray-900 hover:text-white dark:hover:bg-gray-200 dark:hover:text-gray-900 hover:scale-105"
           >
-            <a href="/courses">Browse Courses</a>
+            <Link href="/courses">Browse Courses</Link>
           </Button>
         </motion.div>
       </div>

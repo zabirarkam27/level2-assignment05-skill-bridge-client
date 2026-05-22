@@ -8,20 +8,11 @@ import {
   LayoutDashboard,
   CalendarDays,
   Star,
-  DollarSign,
   Users,
   Clock,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-
-interface Stats {
-  totalSessions: number;
-  completedSessions: number;
-  totalStudents: number;
-  averageRating: number;
-  totalEarnings: number;
-}
 
 function StatCard({
   icon,

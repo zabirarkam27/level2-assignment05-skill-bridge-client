@@ -43,7 +43,9 @@ export default function AdminBookingsPage() {
       const q = search.toLowerCase();
       return (
         b.tutor?.user.name?.toLowerCase().includes(q) ||
-        b.student?.name?.toLowerCase().includes(q)
+        b.student?.name?.toLowerCase().includes(q) ||
+        b.course?.title?.toLowerCase().includes(q) ||
+        b.course?.category?.name?.toLowerCase().includes(q)
       );
     });
 
@@ -72,7 +74,7 @@ export default function AdminBookingsPage() {
 
       {/* Filter tabs */}
       <div className="flex gap-2 mb-5 flex-wrap">
-        {(["ALL", "CONFIRMED", "COMPLETED", "CANCELLED"] as const).map((s) => (
+        {(["ALL", "PENDING", "CONFIRMED", "COMPLETED", "CANCELLED"] as const).map((s) => (
           <button
             key={s}
             onClick={() => setFilter(s)}
@@ -120,6 +122,12 @@ export default function AdminBookingsPage() {
                     {booking.student?.name || "Student"}{" "}
                     <span className="font-normal text-gray-400">→</span>{" "}
                     {booking.tutor?.user.name || "Tutor"}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    {booking.course?.title || "Course not assigned"}
+                    {booking.course?.category?.name
+                      ? ` · ${booking.course.category.name}`
+                      : ""}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                     {new Date(booking.dateTime).toLocaleDateString()} •{" "}

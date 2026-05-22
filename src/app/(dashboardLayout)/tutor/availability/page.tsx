@@ -1,11 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AvailabilitySlot } from "@/types/routes.type";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Clock, Plus, Trash2, Save } from "lucide-react";
 import { motion } from "framer-motion";
+import ConfirmActionDialog from "@/components/ConfirmActionDialog";
+
+type AvailabilityFormSlot = {
+  day: string;
+  startTime: string;
+  endTime: string;
+};
+
+type AvailabilityApiSlot = {
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+};
 
 const DAYS = [
   "Monday",
@@ -22,7 +34,7 @@ function SlotRow({
   onRemove,
   onChange,
 }: {
-  slot: Omit<AvailabilitySlot, "id" | "isBooked">;
+  slot: AvailabilityFormSlot;
   onRemove: () => void;
   onChange: (updates: Partial<typeof slot>) => void;
 }) {
@@ -83,11 +95,10 @@ const INV_DAY_MAP: Record<number, string> = Object.fromEntries(
 );
 
 export default function TutorAvailabilityPage() {
-  const [slots, setSlots] = useState<
-    Omit<AvailabilitySlot, "id" | "isBooked">[]
-  >([]);
+  const [slots, setSlots] = useState<AvailabilityFormSlot[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [slotToRemove, setSlotToRemove] = useState<number | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -99,7 +110,7 @@ export default function TutorAvailabilityPage() {
           `${process.env.NEXT_PUBLIC_API_URL}/availability`,
           {
             credentials: "include",
-            signal: controller.signal
+            signal: controller.signal,
           },
         );
         if (!isMounted) return;
@@ -107,11 +118,13 @@ export default function TutorAvailabilityPage() {
         const raw = Array.isArray(data.data) ? data.data : [];
         if (isMounted) {
           setSlots(
-            raw.map(({ dayOfWeek, startTime, endTime }: any) => ({
-              day: INV_DAY_MAP[dayOfWeek] || "Monday",
-              startTime,
-              endTime,
-            })),
+            raw.map(
+              ({ dayOfWeek, startTime, endTime }: AvailabilityApiSlot) => ({
+                day: INV_DAY_MAP[dayOfWeek] || "Monday",
+                startTime,
+                endTime,
+              }),
+            ),
           );
         }
       } catch {
@@ -141,6 +154,7 @@ export default function TutorAvailabilityPage() {
 
   const removeSlot = (i: number) => {
     setSlots((s) => s.filter((_, idx) => idx !== i));
+    setSlotToRemove(null);
   };
 
   const updateSlot = (i: number, updates: Partial<(typeof slots)[0]>) => {
@@ -218,7 +232,7 @@ export default function TutorAvailabilityPage() {
                   >
                     <SlotRow
                       slot={slot}
-                      onRemove={() => removeSlot(i)}
+                      onRemove={() => setSlotToRemove(i)}
                       onChange={(u) => updateSlot(i, u)}
                     />
                   </motion.div>
@@ -251,6 +265,17 @@ export default function TutorAvailabilityPage() {
           </>
         )}
       </div>
+      <ConfirmActionDialog
+        open={slotToRemove !== null}
+        onOpenChange={(open) => !open && setSlotToRemove(null)}
+        title="Remove availability slot?"
+        description="Students will no longer be able to book this time slot after you save your availability."
+        confirmText="Remove Slot"
+        danger
+        onConfirm={() => {
+          if (slotToRemove !== null) removeSlot(slotToRemove);
+        }}
+      />
     </div>
   );
 }

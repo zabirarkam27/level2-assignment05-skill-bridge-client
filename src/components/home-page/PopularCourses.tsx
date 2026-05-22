@@ -39,11 +39,13 @@ export default function PopularCourses() {
           Explore Courses
         </motion.button>
       </div>
-      <AllCourses
-        limit={6}
-        popularOnly
-        emptyMessage="No popular courses yet. Check back soon!"
-      />
+      <div className="mt-6">
+        <AllCourses
+          limit={6}
+          popularOnly
+          emptyMessage="No popular courses yet. Check back soon!"
+        />
+      </div>
     </motion.div>
   );
 }

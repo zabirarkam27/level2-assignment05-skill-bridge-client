@@ -21,6 +21,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useLogout } from "@/lib/logout";
 import { getAvatarUrl } from "@/lib/avatar";
+import Image from "next/image";
 
 interface NavItem {
   title: string;
@@ -31,30 +32,94 @@ interface NavItem {
 function getNavItems(role?: string): NavItem[] {
   if (role === "TUTOR") {
     return [
-      { title: "Dashboard", href: "/tutor/dashboard", icon: <LayoutDashboard className="w-4 h-4" /> },
-      { title: "My Sessions", href: "/tutor/sessions", icon: <CalendarDays className="w-4 h-4" /> },
-      { title: "Availability", href: "/tutor/availability", icon: <Clock className="w-4 h-4" /> },
-      { title: "Reviews", href: "/tutor/reviews", icon: <Star className="w-4 h-4" /> },
-      { title: "My Courses", href: "/tutor/courses", icon: <BookOpen className="w-4 h-4" /> },
-      { title: "Profile", href: "/tutor/profile", icon: <User className="w-4 h-4" /> },
+      {
+        title: "Dashboard",
+        href: "/tutor/dashboard",
+        icon: <LayoutDashboard className="w-4 h-4" />,
+      },
+      {
+        title: "My Sessions",
+        href: "/tutor/sessions",
+        icon: <CalendarDays className="w-4 h-4" />,
+      },
+      {
+        title: "Availability",
+        href: "/tutor/availability",
+        icon: <Clock className="w-4 h-4" />,
+      },
+      {
+        title: "Reviews",
+        href: "/tutor/reviews",
+        icon: <Star className="w-4 h-4" />,
+      },
+      {
+        title: "My Courses",
+        href: "/tutor/courses",
+        icon: <BookOpen className="w-4 h-4" />,
+      },
+      {
+        title: "Profile",
+        href: "/tutor/profile",
+        icon: <User className="w-4 h-4" />,
+      },
     ];
   }
   if (role === "ADMIN") {
     return [
-      { title: "Dashboard", href: "/admin", icon: <LayoutDashboard className="w-4 h-4" /> },
-      { title: "Users", href: "/admin/users", icon: <Users className="w-4 h-4" /> },
-      { title: "Tutor Requests", href: "/admin/tutors", icon: <UserCheck className="w-4 h-4" /> },
-      { title: "Bookings", href: "/admin/bookings", icon: <BookOpen className="w-4 h-4" /> },
-      { title: "Categories", href: "/admin/categories", icon: <FolderOpen className="w-4 h-4" /> },
-      { title: "Courses", href: "/admin/courses", icon: <BookOpen className="w-4 h-4" /> },
+      {
+        title: "Dashboard",
+        href: "/admin",
+        icon: <LayoutDashboard className="w-4 h-4" />,
+      },
+      {
+        title: "Users",
+        href: "/admin/users",
+        icon: <Users className="w-4 h-4" />,
+      },
+      {
+        title: "Tutor Requests",
+        href: "/admin/tutors",
+        icon: <UserCheck className="w-4 h-4" />,
+      },
+      {
+        title: "Bookings",
+        href: "/admin/bookings",
+        icon: <BookOpen className="w-4 h-4" />,
+      },
+      {
+        title: "Categories",
+        href: "/admin/categories",
+        icon: <FolderOpen className="w-4 h-4" />,
+      },
+      {
+        title: "Courses",
+        href: "/admin/courses",
+        icon: <BookOpen className="w-4 h-4" />,
+      },
     ];
   }
   // STUDENT default
   return [
-    { title: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-4 h-4" /> },
-    { title: "My Bookings", href: "/dashboard/bookings", icon: <CalendarDays className="w-4 h-4" /> },
-    { title: "Reviews", href: "/dashboard/reviews", icon: <Star className="w-4 h-4" /> },
-    { title: "Profile", href: "/dashboard/profile", icon: <User className="w-4 h-4" /> },
+    {
+      title: "Dashboard",
+      href: "/dashboard",
+      icon: <LayoutDashboard className="w-4 h-4" />,
+    },
+    {
+      title: "My Bookings",
+      href: "/dashboard/bookings",
+      icon: <CalendarDays className="w-4 h-4" />,
+    },
+    {
+      title: "Reviews",
+      href: "/dashboard/reviews",
+      icon: <Star className="w-4 h-4" />,
+    },
+    {
+      title: "Profile",
+      href: "/dashboard/profile",
+      icon: <User className="w-4 h-4" />,
+    },
   ];
 }
 
@@ -81,10 +146,18 @@ export function DashboardSidebar() {
       <div className="p-6 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full overflow-hidden shrink-0">
-            <img src={getAvatarUrl(user?.image)} alt={user?.name ?? "User"} className="w-full h-full object-cover" />
+            <Image
+              src={getAvatarUrl(user?.image)}
+              alt={user?.name ?? "User"}
+              width={40}
+              height={40}
+              className="w-full h-full object-cover"
+            />
           </div>
           <div className="overflow-hidden">
-            <p className="font-semibold text-sm text-gray-900 dark:text-white truncate">{user?.name}</p>
+            <p className="font-semibold text-sm text-gray-900 dark:text-white truncate">
+              {user?.name}
+            </p>
             <span className="text-xs px-1.5 py-0.5 rounded bg-[#611f69]/10 text-[#611f69] dark:bg-[#c084fc]/20 dark:text-[#c084fc] capitalize">
               {user?.role?.toLowerCase() || "user"}
             </span>
@@ -95,7 +168,8 @@ export function DashboardSidebar() {
       {/* Nav links */}
       <nav className="flex-1 p-4 space-y-1">
         {navItems.map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+          const isActive =
+            pathname === item.href || pathname.startsWith(item.href + "/");
           return (
             <Link
               key={item.href}
@@ -109,7 +183,13 @@ export function DashboardSidebar() {
             >
               {item.icon}
               <span className="flex-1">{item.title}</span>
-              <ChevronRight className={cn("w-3 h-3 opacity-0 -translate-x-1 transition-all", "group-hover:opacity-100 group-hover:translate-x-0", isActive && "opacity-100 translate-x-0")} />
+              <ChevronRight
+                className={cn(
+                  "w-3 h-3 opacity-0 -translate-x-1 transition-all",
+                  "group-hover:opacity-100 group-hover:translate-x-0",
+                  isActive && "opacity-100 translate-x-0",
+                )}
+              />
             </Link>
           );
         })}

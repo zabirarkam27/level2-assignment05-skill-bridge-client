@@ -3,8 +3,9 @@
 import { useSessionContext } from "@/context/SessionContext";
 import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect } from "react";
-import { Menu, Clock, XCircle } from "lucide-react";
+import { Menu, Clock, XCircle, ShieldAlert } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useLogout } from "@/lib/logout";
@@ -66,6 +67,44 @@ function RejectedScreen() {
   );
 }
 
+function getAllowedRole(pathname: string) {
+  if (pathname.startsWith("/admin")) return "ADMIN";
+  if (pathname.startsWith("/tutor")) return "TUTOR";
+  if (pathname.startsWith("/dashboard/")) return "STUDENT";
+  return null;
+}
+
+function getDashboardHome(role?: string): string {
+  if (role === "ADMIN") return "/admin";
+  if (role === "TUTOR") return "/tutor/dashboard";
+  return "/dashboard";
+}
+
+function ForbiddenScreen({ role }: { role?: string }) {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 dark:bg-gray-950">
+      <div className="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
+          <ShieldAlert className="h-8 w-8 text-red-500 dark:text-red-400" />
+        </div>
+        <h1 className="mb-2 text-xl font-bold text-gray-900 dark:text-white">
+          Access Denied
+        </h1>
+        <p className="text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+          Your account does not have permission to view this dashboard area.
+        </p>
+        <button
+          type="button"
+          onClick={() => window.location.assign(getDashboardHome(role))}
+          className="mt-6 rounded-md bg-[#611f69] px-4 py-2 text-sm font-medium text-white hover:bg-[#4a174f] dark:bg-[#c084fc] dark:text-black dark:hover:bg-[#d8b4fe]"
+        >
+          Go to my dashboard
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function DashboardLayout({
   children,
 }: {
@@ -73,6 +112,7 @@ export default function DashboardLayout({
 }) {
   const { user, loading } = useSessionContext();
   const router = useRouter();
+  const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -96,6 +136,11 @@ export default function DashboardLayout({
 
   if (user.status === "PENDING") return <PendingScreen />;
   if (user.status === "REJECTED") return <RejectedScreen />;
+
+  const allowedRole = getAllowedRole(pathname);
+  if (allowedRole && user.role !== allowedRole) {
+    return <ForbiddenScreen role={user.role} />;
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950">

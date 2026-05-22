@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Course } from "@/types/routes.type";
 import { CourseGrid } from "./CourseGrid";
+import { fetchPublicApi } from "@/lib/public-api";
 
 interface AllCoursesProps {
   limit?: number;
@@ -22,10 +23,10 @@ export default function AllCourses({
     const fetchCourses = async () => {
       try {
         const url = popularOnly
-          ? `${process.env.NEXT_PUBLIC_API_URL}/courses/popular`
-          : `${process.env.NEXT_PUBLIC_API_URL}/courses`;
+          ? "/courses/popular"
+          : "/courses";
 
-        const res = await fetch(url);
+        const res = await fetchPublicApi(url);
         const data = await res.json();
         setCourses(Array.isArray(data.data) ? data.data : []);
       } catch {
@@ -40,7 +41,7 @@ export default function AllCourses({
   const displayCourses = limit ? courses.slice(0, limit) : courses;
 
   return (
-    <section className="bg-white px-6 transition-colors duration-300 dark:bg-gray-900">
+    <section className="bg-white p-6 transition-colors duration-300 dark:bg-gray-900">
       <div className="mx-auto max-w-7xl">
         <CourseGrid
           courses={displayCourses}

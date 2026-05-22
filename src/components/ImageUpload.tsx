@@ -54,7 +54,13 @@ export default function ImageUpload({
   return (
     <div className="flex flex-col items-center gap-3">
       <div className="relative w-24 h-24 rounded-full overflow-hidden ring-4 ring-[#611f69]/20 dark:ring-[#c084fc]/20">
-        <Image src={displayImage} alt="avatar" fill className="object-cover" />
+        <Image
+          src={displayImage}
+          alt="avatar"
+          fill
+          className="object-cover"
+          sizes="96px"
+        />
         {uploading && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
             <Loader2 className="w-6 h-6 text-white animate-spin" />

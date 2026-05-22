@@ -4,7 +4,7 @@ import { BookOpen } from "lucide-react";
 export default function CoursesPage() {
   return (
     <div className="mb-20 min-h-[80vh]">
-      <div className="bg-gradient-to-b from-[#611f69]/5 to-transparent px-6 py-14 dark:from-[#c084fc]/10">
+      <div className="bg-linear-to-b from-[#611f69]/5 to-transparent px-6 py-14 dark:from-[#c084fc]/10">
         <div className="mx-auto max-w-7xl text-center">
           <h1 className="flex items-center justify-center gap-2 text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">
             <BookOpen className="h-8 w-8 text-[#611f69] dark:text-[#c084fc]" />

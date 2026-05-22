@@ -23,6 +23,7 @@ import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import * as z from "zod";
 import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useSessionContext } from "@/context/SessionContext";
 import { Eye, EyeOff } from "lucide-react";
 
@@ -36,6 +37,7 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<typeof Card>) {
   const { refetch } = useSessionContext();
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const form = useForm({
     defaultValues: {
@@ -49,18 +51,20 @@ export function LoginForm({
       const toastId = toast.loading("Logging in...");
 
       try {
-        const { data, error } = await authClient.signIn.email({
+        const { error } = await authClient.signIn.email({
           email: value.email,
           password: value.password,
           callbackURL: `${process.env.NEXT_PUBLIC_APP_URL}`,
         });
-        await refetch();
         if (error) {
           toast.error(error.message, { id: toastId });
           return;
         }
 
+        await refetch();
         toast.success("Logged  in successfully", { id: toastId });
+        router.replace("/dashboard");
+        router.refresh();
       } catch {
         toast.error("Something went wrong", { id: toastId });
       }
@@ -72,11 +76,10 @@ export function LoginForm({
 
   const handleGoogleLogin = async () => {
     try {
-      const data = await authClient.signIn.social({
+      await authClient.signIn.social({
         provider: "google",
         callbackURL: `${process.env.NEXT_PUBLIC_APP_URL}`,
       });
-      console.log(data);
     } catch {
       toast.error("Google login Failed");
     }
@@ -206,4 +209,3 @@ export function LoginForm({
     </div>
   );
 }
-

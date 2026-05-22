@@ -20,6 +20,7 @@ export interface Course {
   image?: string | null;
   isPopular: boolean;
   categoryId: string;
+  tutorId?: string | null;
   category: Category;
   createdBy: {
     id: string;
@@ -27,8 +28,24 @@ export interface Course {
     image?: string | null;
     role: UserRole;
   };
+  tutor?: {
+    id: string;
+    name: string;
+    image?: string | null;
+    role?: UserRole;
+    status?: UserStatus;
+    tutorProfile?: {
+      id: string;
+    } | null;
+  } | null;
   createdAt: string;
   updatedAt?: string;
+  deleteRequests?: {
+    id: string;
+    requesterId: string;
+    status: "PENDING" | "APPROVED" | "REJECTED";
+    createdAt: string;
+  }[];
 }
 
 export interface Mentor {
@@ -42,7 +59,9 @@ export interface Mentor {
     name: string;
     image?: string;
     email?: string;
+    assignedCourses?: Course[];
   };
+  courses?: Course[];
 }
 
 export interface AvailabilitySlot {
@@ -60,9 +79,11 @@ export interface Booking {
   id: string;
   studentId: string;
   tutorId: string;
+  courseId?: string | null;
   dateTime: string; // ISO datetime string from API
   status: BookingStatus;
   createdAt: string;
+  course?: Course | null;
   tutor?: Mentor;
   student?: {
     id: string;

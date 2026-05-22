@@ -61,8 +61,13 @@ function BookingCard({
             {booking.tutor?.user.name || "Tutor"}
           </h3>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-            {(booking.tutor as any)?.subjects?.[0] ?? "Tutoring Session"}
+            {booking.course?.title ?? "Tutoring Session"}
           </p>
+          {booking.course?.category?.name && (
+            <p className="mt-1 text-[11px] font-medium text-[#611f69] dark:text-[#c084fc]">
+              {booking.course.category.name}
+            </p>
+          )}
           <div className="flex flex-wrap gap-3 mt-3 text-xs text-gray-500 dark:text-gray-400">
             <span className="flex items-center gap-1">
               <CalendarDays className="w-3.5 h-3.5" />

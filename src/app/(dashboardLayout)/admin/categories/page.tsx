@@ -6,7 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { FolderOpen, Plus, Trash2, X, Check, Pencil } from "lucide-react";
+import {
+  FolderOpen,
+  Plus,
+  Trash2,
+  X,
+  Check,
+  Pencil,
+  Loader2,
+} from "lucide-react";
 import Image from "next/image";
 import {
   Dialog,
@@ -27,6 +35,7 @@ export default function AdminCategoriesPage() {
   const [deleting, setDeleting] = useState<string | null>(null);
 
   const [saving, setSaving] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
@@ -50,7 +59,10 @@ export default function AdminCategoriesPage() {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`);
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/categories?dashboard=${Date.now()}`,
+        { cache: "no-store", credentials: "include" },
+      );
 
       const data = await res.json();
 
@@ -81,17 +93,25 @@ export default function AdminCategoriesPage() {
         body: JSON.stringify(form),
       });
 
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message || "Failed to create category");
+      }
+
+      const data = await res.json();
 
       toast.success("Category created!");
+      if (data.data) {
+        setCategories((prev) => [data.data, ...prev]);
+      }
 
       resetForm();
 
       setShowForm(false);
-
-      fetchCategories();
-    } catch {
-      toast.error("Failed to create category");
+    } catch (err: unknown) {
+      toast.error(
+        err instanceof Error ? err.message : "Failed to create category",
+      );
     } finally {
       setSaving(false);
     }
@@ -115,17 +135,27 @@ export default function AdminCategoriesPage() {
         },
       );
 
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message || "Failed to update category");
+      }
+
+      const data = await res.json();
 
       toast.success("Category updated!");
+      if (data.data) {
+        setCategories((prev) =>
+          prev.map((cat) => (cat.id === data.data.id ? data.data : cat)),
+        );
+      }
 
       resetForm();
 
       setShowForm(false);
-
-      fetchCategories();
-    } catch {
-      toast.error("Failed to update category");
+    } catch (err: unknown) {
+      toast.error(
+        err instanceof Error ? err.message : "Failed to update category",
+      );
     } finally {
       setSaving(false);
     }
@@ -143,15 +173,34 @@ export default function AdminCategoriesPage() {
         },
       );
 
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message || "Failed to delete category");
+      }
 
       setCategories((prev) => prev.filter((cat) => cat.id !== id));
 
       toast.success("Category deleted");
-    } catch {
-      toast.error("Failed to delete category");
+    } catch (err: unknown) {
+      toast.error(
+        err instanceof Error ? err.message : "Failed to delete category",
+      );
     } finally {
       setDeleting(null);
+    }
+  };
+
+  const handleImageUpload = async (file: File) => {
+    setUploadingImage(true);
+
+    try {
+      const result = await uploadOptimizedImage(file, "category");
+      setForm((f) => ({ ...f, image: result.url }));
+      toast.success(`Image optimized (${result.format.toUpperCase()})`);
+    } catch {
+      toast.error("Image upload failed");
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -209,6 +258,7 @@ export default function AdminCategoriesPage() {
                     alt={cat.name}
                     fill
                     className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
 
                   <div className="absolute inset-0 bg-black/20" />
@@ -329,20 +379,21 @@ export default function AdminCategoriesPage() {
                 type="file"
                 accept="image/*"
                 title="Upload category image"
+                disabled={uploadingImage}
                 onChange={async (e) => {
                   const file = e.target.files?.[0];
                   if (!file) return;
 
-                  try {
-                    const result = await uploadOptimizedImage(file, "category");
-                    setForm((f) => ({ ...f, image: result.url }));
-                    toast.success(`Image optimized (${result.format.toUpperCase()})`);
-                  } catch {
-                    toast.error("Image upload failed");
-                  }
+                  await handleImageUpload(file);
                 }}
                 className="block w-full text-sm"
               />
+              {uploadingImage && (
+                <p className="mt-1 flex items-center gap-1 text-xs text-gray-500">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  Optimizing and uploading image...
+                </p>
+              )}
             </div>
 
             <div>
@@ -360,6 +411,17 @@ export default function AdminCategoriesPage() {
                 }
                 placeholder="https://..."
               />
+              {form.image && (
+                <div className="relative mt-3 h-28 overflow-hidden rounded-lg border border-gray-100 bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
+                  <Image
+                    src={form.image}
+                    alt="Category preview"
+                    fill
+                    className="object-cover"
+                    sizes="320px"
+                  />
+                </div>
+              )}
             </div>
           </div>
 
@@ -377,10 +439,15 @@ export default function AdminCategoriesPage() {
 
             <Button
               onClick={editingCategory ? handleUpdate : handleCreate}
-              disabled={saving || !form.name.trim()}
+              disabled={saving || uploadingImage || !form.name.trim()}
               className="bg-[#611f69] text-white hover:bg-[#4a174f] dark:bg-[#c084fc] dark:text-black"
             >
-              {saving ? (
+              {uploadingImage ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                  Optimizing...
+                </>
+              ) : saving ? (
                 editingCategory ? (
                   "Updating..."
                 ) : (

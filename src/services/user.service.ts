@@ -1,14 +1,14 @@
 import { env } from "@/env";
 import { cookies } from "next/headers";
 
-const AUTH_URL = env.AUTH_URL;
+const AUTH_URL = env.NEXT_PUBLIC_AUTH_URL;
 
 export const userService = {
   getSession: async function () {
     try {
       const cookieStore = await cookies();
 
-      const res = await fetch(`${AUTH_URL}/get-session`, {
+      const res = await fetch(`${AUTH_URL}/api/auth/get-session`, {
         headers: {
           Cookie: cookieStore.toString(),
         },
@@ -26,8 +26,7 @@ export const userService = {
       }
 
       return { data: session, error: null };
-    } catch (error) {
-      console.error("Error fetching session:", error);
+    } catch {
       return { data: null, error: { message: "Something Went Wrong" } };
     }
   },

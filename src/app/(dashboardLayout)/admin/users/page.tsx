@@ -5,7 +5,14 @@ import { AppUser } from "@/types/routes.type";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Users, Search, ShieldOff, ShieldCheck, Trash2 } from "lucide-react";
+import {
+  GraduationCap,
+  Search,
+  ShieldCheck,
+  ShieldOff,
+  Trash2,
+  Users,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -19,7 +26,15 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { UserPlus } from "lucide-react";
-import { getAvatarUrl } from "@/lib/avatar";
+import ConfirmActionDialog from "@/components/ConfirmActionDialog";
+
+type UserTab = "ALL" | "STUDENT" | "TUTOR";
+
+const userTabs: { label: string; value: UserTab }[] = [
+  { label: "All", value: "ALL" },
+  { label: "Students", value: "STUDENT" },
+  { label: "Tutors", value: "TUTOR" },
+];
 
 function DeleteDialog({
   user,
@@ -77,7 +92,10 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<AppUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [activeTab, setActiveTab] = useState<UserTab>("ALL");
   const [updating, setUpdating] = useState<string | null>(null);
+  const [undoTarget, setUndoTarget] = useState<AppUser | null>(null);
+  const [statusTarget, setStatusTarget] = useState<AppUser | null>(null);
 
   const fetchUsers = async () => {
     try {
@@ -115,6 +133,7 @@ export default function AdminUsersPage() {
           usr.id === userId ? { ...usr, status: newStatus as "ACTIVE" | "BANNED" } : usr,
         ),
       );
+      setStatusTarget(null);
       toast.success(`User ${newStatus === "BANNED" ? "banned" : "unbanned"} successfully`);
     } catch {
       toast.error("Failed to update user status");
@@ -147,13 +166,51 @@ export default function AdminUsersPage() {
     }
   };
 
+  const undoTutor = async (userId: string) => {
+    setUpdating(userId);
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/users/${userId}/undo-mentor`,
+        {
+          method: "POST",
+          credentials: "include",
+        },
+      );
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || "Failed");
+
+      setUsers((currentUsers) =>
+        currentUsers.map((user) =>
+          user.id === userId
+            ? {
+                ...user,
+                role: "STUDENT",
+                status: "ACTIVE",
+                tutorProfile: null,
+              }
+            : user,
+        ),
+      );
+      toast.success("Tutor changed back to student");
+      setUndoTarget(null);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed to undo tutor");
+    } finally {
+      setUpdating(null);
+    }
+  };
+
   const filtered = users.filter(
-    (u) =>
-      u.name.toLowerCase().includes(search.toLowerCase()) ||
-      u.email.toLowerCase().includes(search.toLowerCase()),
+    (u) => {
+      const matchesTab = activeTab === "ALL" || u.role === activeTab;
+      const matchesSearch =
+        u.name.toLowerCase().includes(search.toLowerCase()) ||
+        u.email.toLowerCase().includes(search.toLowerCase());
+
+      return matchesTab && matchesSearch;
+    },
   );
 
-  console.log(users);
   return (
     <>
       <div>
@@ -183,6 +240,22 @@ export default function AdminUsersPage() {
               <UserPlus className="w-4 h-4 mr-2" /> Manage Mentors
             </Link>
           </Button>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {userTabs.map((tab) => (
+            <button
+              key={tab.value}
+              type="button"
+              onClick={() => setActiveTab(tab.value)}
+              className={`rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
+                activeTab === tab.value
+                  ? "border-[#611f69] bg-[#611f69] text-white dark:border-[#c084fc] dark:bg-[#c084fc] dark:text-black"
+                  : "border-gray-200 text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -257,7 +330,7 @@ export default function AdminUsersPage() {
                         size="sm"
                         variant="outline"
                         disabled={updating === user.id}
-                        onClick={() => toggleBan(user.id, user.status || "ACTIVE")}
+                        onClick={() => setStatusTarget(user)}
                         className={`text-xs h-8 ${user.status === "BANNED"
                           ? "border-green-500 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20"
                           : "border-red-400 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
@@ -269,6 +342,19 @@ export default function AdminUsersPage() {
                           <><ShieldOff className="w-3.5 h-3.5 mr-1" /> Ban</>
                         )}
                       </Button>
+
+                      {user.role === "TUTOR" && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={updating === user.id}
+                          onClick={() => setUndoTarget(user)}
+                          className="h-8 border-amber-400 text-xs text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20"
+                        >
+                          <GraduationCap className="mr-1 h-3.5 w-3.5" />
+                          Undo Tutor
+                        </Button>
+                      )}
 
                       {/* Delete Dialog */}
                       <DeleteDialog
@@ -284,6 +370,48 @@ export default function AdminUsersPage() {
           </div>
         )}
       </div>
+      <ConfirmActionDialog
+        open={!!undoTarget}
+        onOpenChange={(open) => !open && setUndoTarget(null)}
+        title="Undo tutor role?"
+        description={
+          <>
+            <strong>{undoTarget?.name}</strong> will become a student again.
+            Assigned courses will no longer show this user as instructor.
+          </>
+        }
+        confirmText="Undo Tutor"
+        loading={!!undoTarget && updating === undoTarget.id}
+        onConfirm={() => {
+          if (undoTarget) undoTutor(undoTarget.id);
+        }}
+      />
+      <ConfirmActionDialog
+        open={!!statusTarget}
+        onOpenChange={(open) => !open && setStatusTarget(null)}
+        title={
+          statusTarget?.status === "BANNED"
+            ? "Unban this user?"
+            : "Ban this user?"
+        }
+        description={
+          <>
+            {statusTarget?.status === "BANNED" ? "Unban" : "Ban"}{" "}
+            <strong>{statusTarget?.name}</strong>
+            {statusTarget?.role === "TUTOR" &&
+              statusTarget?.status !== "BANNED" &&
+              ". Banned tutors will be hidden from the mentors list."}
+          </>
+        }
+        confirmText={statusTarget?.status === "BANNED" ? "Unban" : "Ban"}
+        danger={statusTarget?.status !== "BANNED"}
+        loading={!!statusTarget && updating === statusTarget.id}
+        onConfirm={() => {
+          if (statusTarget) {
+            toggleBan(statusTarget.id, statusTarget.status || "ACTIVE");
+          }
+        }}
+      />
     </>
   );
 }
