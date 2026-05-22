@@ -4,11 +4,9 @@ Frontend for the Assignment 4 SkillBridge full-stack project.
 
 ## Live Links
 
-- Frontend: add your deployed frontend URL here
-- Backend: add your deployed backend URL here
-- Video walkthrough: add your video URL here
-- Frontend repository: add your frontend GitHub URL here
-- Backend repository: add your backend GitHub URL here
+- Frontend: `https://skill-bridge-client-two-beta.vercel.app/`
+- Backend: `https://skill-bridge-server-tan.vercel.app/`
+- Video walkthrough: `https://drive.google.com/file/d/1eSWTzs7AbmhB9P2nNIkrv_M_C003kcoB/view`
 
 ## Admin Credentials
 
@@ -34,7 +32,3 @@ Run the backend admin seed before testing these credentials.
 - Student: browse tutors, book sessions, view bookings, leave reviews, manage profile.
 - Tutor: manage profile, set availability, view sessions, mark sessions completed, manage reviews.
 - Admin: manage users, ban/unban users, approve tutors, view bookings, manage categories and courses.
-
-## Payment Rule
-
-No online payment integration is used. Bookings follow the no-online-payment / Cash on Delivery requirement.
