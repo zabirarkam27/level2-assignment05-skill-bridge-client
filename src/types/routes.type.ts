@@ -74,6 +74,7 @@ export interface AvailabilitySlot {
 }
 
 export type BookingStatus = "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED";
+export type PaymentStatus = "INITIATED" | "PAID" | "FAILED" | "CANCELLED";
 
 export interface Booking {
   id: string;
@@ -91,7 +92,58 @@ export interface Booking {
     email: string;
     image?: string;
   };
+  payment?: {
+    id: string;
+    bookingId?: string | null;
+    status: PaymentStatus;
+    gateway: string;
+    amount: number;
+    currency: string;
+    transactionId: string;
+    createdAt: string;
+  } | null;
   review?: unknown;
+}
+
+export interface PaymentHistoryItem {
+  id: string;
+  transactionId: string;
+  gateway: string;
+  status: PaymentStatus;
+  amount: number;
+  currency: string;
+  studentId: string;
+  tutorId: string;
+  courseId: string;
+  bookingId?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  student?: {
+    id: string;
+    name: string;
+    email: string;
+    image?: string | null;
+  } | null;
+  tutor?: {
+    id: string;
+    user?: {
+      id: string;
+      name: string;
+      email: string;
+      image?: string | null;
+    };
+  } | null;
+  course?: (Course & {
+    category?: {
+      id: string;
+      name: string;
+    };
+  }) | null;
+  booking?: {
+    id: string;
+    status: BookingStatus;
+    dateTime: string;
+  } | null;
 }
 
 export interface Review {

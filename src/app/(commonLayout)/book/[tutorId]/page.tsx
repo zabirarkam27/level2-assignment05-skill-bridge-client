@@ -212,7 +212,7 @@ export default function BookPage() {
         animate={{ opacity: 1, y: 0 }}
         className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 mb-6 flex items-center gap-4"
       >
-        <div className="w-16 h-16 rounded-xl overflow-hidden ring-2 ring-[#611f69]/20 flex-shrink-0">
+        <div className="w-16 h-16 rounded-xl overflow-hidden ring-2 ring-[#611f69]/20 shrink-0">
           <Image
             src={getAvatarUrl(mentor.user.image)}
             alt={mentor.user.name}
@@ -277,14 +277,14 @@ export default function BookPage() {
 
         {/* Availability slots */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-1.5">
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-1.5">
             <Clock className="w-4 h-4 text-[#611f69] dark:text-[#c084fc]" />
             Select Time Slot
           </label>
           {availability.length === 0 ? (
             <div className="rounded-xl border border-[#611f69]/15 bg-[#611f69]/5 p-4 text-sm text-gray-600 dark:border-[#c084fc]/20 dark:bg-[#c084fc]/10 dark:text-gray-300">
               <div className="flex items-start gap-3">
-                <Info className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#611f69] dark:text-[#c084fc]" />
+                <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#611f69] dark:text-[#c084fc]" />
                 <div>
                   <p className="font-medium text-gray-900 dark:text-white">
                     This mentor is currently unavailable for booking.
@@ -326,7 +326,7 @@ export default function BookPage() {
 
         {/* Date */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-1.5">
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-1.5">
             <CalendarDays className="w-4 h-4 text-[#611f69] dark:text-[#c084fc]" />
             Preferred Date
           </label>

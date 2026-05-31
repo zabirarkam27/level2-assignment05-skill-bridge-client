@@ -6,12 +6,17 @@ import { Badge } from "@/components/ui/badge";
 import { BookOpen, Search } from "lucide-react";
 import { motion } from "framer-motion";
 
-const statusVariant: Record<BookingStatus, "default" | "warning" | "success" | "destructive"> = {
+const statusVariant: Record<
+  BookingStatus,
+  "default" | "warning" | "success" | "destructive"
+> = {
   PENDING: "default",
   CONFIRMED: "warning",
   COMPLETED: "success",
   CANCELLED: "destructive",
 };
+
+const isPaymentPaid = (booking: Booking) => booking.payment?.status === "PAID";
 
 export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -72,7 +77,6 @@ export default function AdminBookingsPage() {
         </div>
       </div>
 
-      {/* Filter tabs */}
       <div className="flex gap-2 mb-5 flex-wrap">
         {(["ALL", "PENDING", "CONFIRMED", "COMPLETED", "CANCELLED"] as const).map((s) => (
           <button
@@ -109,36 +113,55 @@ export default function AdminBookingsPage() {
           </div>
         ) : (
           <div className="divide-y divide-gray-100 dark:divide-gray-700">
-            {filtered.map((booking, i) => (
-              <motion.div
-                key={booking.id}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: i * 0.03 }}
-                className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-              >
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                    {booking.student?.name || "Student"}{" "}
-                    <span className="font-normal text-gray-400">→</span>{" "}
-                    {booking.tutor?.user.name || "Tutor"}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {booking.course?.title || "Course not assigned"}
-                    {booking.course?.category?.name
-                      ? ` · ${booking.course.category.name}`
-                      : ""}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {new Date(booking.dateTime).toLocaleDateString()} •{" "}
-                    {new Date(booking.dateTime).toLocaleTimeString("en-BD", { hour: "2-digit", minute: "2-digit" })}
-                  </p>
-                </div>
-                <Badge variant={statusVariant[booking.status]}>
-                  {booking.status}
-                </Badge>
-              </motion.div>
-            ))}
+            {filtered.map((booking, i) => {
+              const paymentPaid = isPaymentPaid(booking);
+
+              return (
+                <motion.div
+                  key={booking.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: i * 0.03 }}
+                  className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                      {booking.student?.name || "Student"}{" "}
+                      <span className="font-normal text-gray-400">to</span>{" "}
+                      {booking.tutor?.user.name || "Tutor"}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                      {booking.course?.title || "Course not assigned"}
+                      {booking.course?.category?.name
+                        ? ` - ${booking.course.category.name}`
+                        : ""}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                      {new Date(booking.dateTime).toLocaleDateString()} -{" "}
+                      {new Date(booking.dateTime).toLocaleTimeString("en-BD", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                    {booking.status === "PENDING" && (
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <Badge variant={paymentPaid ? "success" : "destructive"}>
+                          {paymentPaid ? "Payment verified" : "Payment pending"}
+                        </Badge>
+                        {booking.payment?.transactionId && (
+                          <span className="text-[11px] text-gray-400">
+                            TXN: {booking.payment.transactionId}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <Badge variant={statusVariant[booking.status]}>
+                    {booking.status}
+                  </Badge>
+                </motion.div>
+              );
+            })}
           </div>
         )}
       </div>

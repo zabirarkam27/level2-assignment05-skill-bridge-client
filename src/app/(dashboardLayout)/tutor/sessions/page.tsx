@@ -15,6 +15,8 @@ const statusVariant: Record<BookingStatus, "default" | "warning" | "success" | "
   CANCELLED: "destructive",
 };
 
+const isPaymentPaid = (booking: Booking) => booking.payment?.status === "PAID";
+
 export default function TutorSessionsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
@@ -83,64 +85,86 @@ export default function TutorSessionsPage() {
     return acc;
   }, {});
 
-  const renderBookingCard = (b: Booking, i: number) => (
-    <motion.div
-      key={b.id}
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: i * 0.06 }}
-      className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-5 shadow-sm flex items-start justify-between gap-4"
-    >
-      <div className="flex-1">
-        <p className="font-semibold text-sm text-gray-900 dark:text-white">
-          {b.student?.name || "Student"}
-        </p>
-        <p className="text-xs text-gray-500 mt-0.5">
-          {b.course?.title || "Course not assigned"}
-        </p>
-        {b.course?.category?.name && (
-          <p className="mt-1 text-[11px] font-medium text-[#611f69] dark:text-[#c084fc]">
-            {b.course.category.name}
+  const renderBookingCard = (b: Booking, i: number) => {
+    const paymentPaid = isPaymentPaid(b);
+    const paymentLabel = paymentPaid ? "Payment verified" : "Payment pending";
+
+    return (
+      <motion.div
+        key={b.id}
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: i * 0.06 }}
+        className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-5 shadow-sm flex items-start justify-between gap-4"
+      >
+        <div className="flex-1">
+          <p className="font-semibold text-sm text-gray-900 dark:text-white">
+            {b.student?.name || "Student"}
           </p>
-        )}
-        <div className="flex gap-3 mt-2 text-xs text-gray-400">
-          <span className="flex items-center gap-1">
-            <CalendarDays className="w-3.5 h-3.5" />
-            {new Date(b.dateTime).toLocaleDateString()}
-          </span>
-          <span className="flex items-center gap-1">
-            <Clock className="w-3.5 h-3.5" />
-            {new Date(b.dateTime).toLocaleTimeString("en-BD", { hour: "2-digit", minute: "2-digit" })}
-          </span>
+          <p className="text-xs text-gray-500 mt-0.5">
+            {b.course?.title || "Course not assigned"}
+          </p>
+          {b.course?.category?.name && (
+            <p className="mt-1 text-[11px] font-medium text-[#611f69] dark:text-[#c084fc]">
+              {b.course.category.name}
+            </p>
+          )}
+          {b.status === "PENDING" && (
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <Badge variant={paymentPaid ? "success" : "destructive"}>
+                {paymentLabel}
+              </Badge>
+              {b.payment?.transactionId && (
+                <span className="text-[11px] text-gray-400">
+                  TXN: {b.payment.transactionId}
+                </span>
+              )}
+            </div>
+          )}
+          <div className="flex gap-3 mt-2 text-xs text-gray-400">
+            <span className="flex items-center gap-1">
+              <CalendarDays className="w-3.5 h-3.5" />
+              {new Date(b.dateTime).toLocaleDateString()}
+            </span>
+            <span className="flex items-center gap-1">
+              <Clock className="w-3.5 h-3.5" />
+              {new Date(b.dateTime).toLocaleTimeString("en-BD", { hour: "2-digit", minute: "2-digit" })}
+            </span>
+          </div>
         </div>
-      </div>
-      <div className="flex flex-col items-end gap-2">
-        <Badge variant={statusVariant[b.status]}>{b.status}</Badge>
-        {b.status === "PENDING" && (
-          <Button
-            size="sm"
-            disabled={actionId === b.id}
-            onClick={() => updateStatus(b.id, "CONFIRMED")}
-            className="text-xs bg-[#611f69] text-white hover:bg-[#4a174f] dark:bg-[#c084fc] dark:text-black h-7 px-3"
-          >
-            <Check className="w-3.5 h-3.5 mr-1" />
-            {actionId === b.id ? "..." : "Confirm"}
-          </Button>
-        )}
-        {b.status === "CONFIRMED" && (
-          <Button
-            size="sm"
-            disabled={actionId === b.id}
-            onClick={() => updateStatus(b.id, "COMPLETED")}
-            className="text-xs bg-green-600 text-white hover:bg-green-700 h-7 px-3"
-          >
-            <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
-            {actionId === b.id ? "..." : "Complete"}
-          </Button>
-        )}
-      </div>
-    </motion.div>
-  );
+        <div className="flex flex-col items-end gap-2">
+          <Badge variant={statusVariant[b.status]}>{b.status}</Badge>
+          {b.status === "PENDING" && (
+            <Button
+              size="sm"
+              disabled={actionId === b.id || !paymentPaid}
+              title={
+                paymentPaid
+                  ? "Confirm this paid booking"
+                  : "Payment must be completed before confirmation"
+              }
+              onClick={() => updateStatus(b.id, "CONFIRMED")}
+              className="text-xs bg-[#611f69] text-white hover:bg-[#4a174f] dark:bg-[#c084fc] dark:text-black h-7 px-3 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <Check className="w-3.5 h-3.5 mr-1" />
+              {actionId === b.id ? "..." : "Confirm"}
+            </Button>
+          )}
+          {b.status === "CONFIRMED" && (
+            <Button
+              size="sm"
+              disabled={actionId === b.id}
+              onClick={() => updateStatus(b.id, "COMPLETED")}
+              className="text-xs bg-green-600 text-white hover:bg-green-700 h-7 px-3"
+            >
+              <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
+              {actionId === b.id ? "..." : "Complete"}
+            </Button>
+          )}
+        </div>
+      </motion.div>
+    );
+  };
 
   return (
     <div className="max-w-3xl">
