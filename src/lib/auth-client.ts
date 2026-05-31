@@ -4,7 +4,7 @@ const browserOrigin =
     typeof window !== "undefined" ? window.location.origin : "";
 
 const authBaseURL = (
-    browserOrigin || process.env.NEXT_PUBLIC_AUTH_URL || "http://localhost:3000"
+    process.env.NEXT_PUBLIC_AUTH_URL || browserOrigin || "http://localhost:5000"
 ).replace(/\/api\/auth\/?$/, "");
 
 export const authClient = createAuthClient({

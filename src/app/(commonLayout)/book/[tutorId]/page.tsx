@@ -147,7 +147,7 @@ export default function BookPage() {
     }
     setSubmitting(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bookings`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/initiate`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -162,8 +162,13 @@ export default function BookPage() {
         const err = await res.json();
         throw new Error(err.message || "Failed");
       }
-      toast.success("Booking request sent! Your tutor will confirm the session.");
-      router.push("/dashboard/bookings");
+      const data = await res.json();
+      const paymentUrl = data?.data?.paymentUrl;
+      if (!paymentUrl) {
+        throw new Error("Payment gateway URL was not returned");
+      }
+      toast.success("Redirecting to secure payment...");
+      window.location.href = paymentUrl;
     } catch (err: any) {
       toast.error(err.message || "Booking failed");
     } finally {
@@ -363,8 +368,8 @@ export default function BookPage() {
           {courses.length === 0 || availability.length === 0
             ? "Booking Unavailable"
             : submitting
-              ? "Submitting..."
-              : "Request Booking"}
+              ? "Preparing Payment..."
+              : "Pay & Request Booking"}
         </Button>
       </motion.div>
     </div>

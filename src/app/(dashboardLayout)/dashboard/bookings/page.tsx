@@ -14,6 +14,7 @@ import {
   XCircle,
 } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 const statusVariant: Record<string, "default" | "success" | "destructive" | "warning"> = {
   PENDING: "default",
@@ -136,6 +137,7 @@ export default function StudentBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<BookingStatus | "ALL">("ALL");
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -154,6 +156,21 @@ export default function StudentBookingsPage() {
     };
     fetchBookings();
   }, []);
+
+  useEffect(() => {
+    const payment = searchParams.get("payment");
+    const message = searchParams.get("message");
+
+    if (payment === "success") {
+      toast.success("Payment successful. Booking request created.");
+    }
+    if (payment === "failed") {
+      toast.error(message || "Payment failed. Booking was not created.");
+    }
+    if (payment === "cancelled") {
+      toast.info("Payment cancelled. Booking was not created.");
+    }
+  }, [searchParams]);
 
   const cancelBooking = async (id: string) => {
     try {

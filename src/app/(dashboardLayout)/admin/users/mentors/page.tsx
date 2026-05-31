@@ -298,11 +298,12 @@ export default function AdminMentorsPage() {
                 <div className="space-y-2">
                   <label className="text-sm font-medium flex items-center gap-2 text-gray-700 dark:text-gray-300">
                     <Wallet className="w-4 h-4 text-gray-400" /> Hourly Price
-                    ($)
+                    (৳)
                   </label>
                   <Input
                     type="number"
-                    placeholder="50"
+                    placeholder="100"
+                    min={100}
                     value={createForm.price || ""}
                     onChange={(e) =>
                       setCreateForm((f) => ({
@@ -368,10 +369,11 @@ export default function AdminMentorsPage() {
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Hourly Price ($)
+                  Hourly Price (৳)
                 </label>
                 <Input
                   type="number"
+                  min={100}
                   value={promoteForm.price || ""}
                   onChange={(e) =>
                     setPromoteForm((f) => ({

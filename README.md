@@ -1,6 +1,6 @@
 # SkillBridge Client
 
-Frontend for the Assignment 4 SkillBridge full-stack project.
+Frontend for the Assignment 5 SkillBridge full-stack project.
 
 ## Live Links
 
@@ -29,6 +29,12 @@ Run the backend admin seed before testing these credentials.
 
 ## Features
 
-- Student: browse tutors, book sessions, view bookings, leave reviews, manage profile.
+- Student: browse tutors, pay before booking sessions, view bookings, leave reviews, manage profile.
 - Tutor: manage profile, set availability, view sessions, mark sessions completed, manage reviews.
 - Admin: manage users, ban/unban users, approve tutors, view bookings, manage categories and courses.
+
+## Payment Flow
+
+Students select a tutor, course, available slot, and date. The app then opens
+SSLCommerz payment. A booking is created only after successful payment, then the
+tutor can confirm the pending session.

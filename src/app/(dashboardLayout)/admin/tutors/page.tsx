@@ -323,11 +323,11 @@ export default function AdminTutorRequestsPage() {
                 onChange={(subjects) => setForm((f) => ({ ...f, subjects }))}
               />
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Hourly Price ($)</label>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Hourly Price (৳)</label>
                 <Input
                   type="number"
-                  placeholder="50"
-                  min={1}
+                  placeholder="100"
+                  min={100}
                   value={form.price}
                   onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))}
                 />

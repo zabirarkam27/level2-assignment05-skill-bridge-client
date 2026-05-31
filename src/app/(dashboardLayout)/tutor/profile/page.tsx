@@ -133,8 +133,8 @@ export default function TutorProfilePage() {
               value={profile.price}
               onChange={(e) => setProfile((p) => ({ ...p, price: Number(e.target.value) }))}
               className="pl-9"
-              placeholder="500"
-              min={0}
+              placeholder="100"
+              min={100}
             />
           </div>
         </div>
