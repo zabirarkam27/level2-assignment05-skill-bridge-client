@@ -24,6 +24,7 @@ import {
 import { ModeToggle } from "./ModeToggle";
 import { useLogout } from "@/lib/logout";
 import { getAvatarUrl } from "@/lib/avatar";
+import NotificationBell from "@/components/notifications/NotificationBell";
 
 interface MenuItem {
   title: string;
@@ -113,6 +114,7 @@ export function Navbar({ className }: NavbarProps) {
           <div className="flex items-center gap-3">
             {!loading && user ? (
               <>
+                <NotificationBell />
                 <Link href="/dashboard">
                   <Image
                     src={getAvatarUrl(user.image)}
@@ -168,86 +170,96 @@ export function Navbar({ className }: NavbarProps) {
             />
           </Link>
 
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button size="icon" variant="outline">
-                <Menu className="h-4 w-4" />
-              </Button>
-            </SheetTrigger>
-
-            <SheetContent className="overflow-y-auto">
-              <SheetHeader>
-                <SheetTitle className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            {!loading && user && (
+              <>
+                <NotificationBell />
+                <Link href="/dashboard" aria-label="Open dashboard">
                   <Image
-                    src="/logo.png"
-                    alt="SkillBridge Logo"
-                    width={32}
-                    height={32}
+                    src={getAvatarUrl(user.image)}
+                    alt="profile"
+                    width={36}
+                    height={36}
+                    className="rounded-full border"
                   />
-                  <span className="relative rounded-md px-3 py-1 text-lg font-semibold tracking-tighter bg-linear-to-r from-[#7b2a85] via-[#611f69] to-[#4a174f] dark:from-[#d8b4fe] dark:via-[#c084fc] dark:to-[#a855f7] bg-size-[200%_200%] bg-left bg-clip-text text-transparent transition-all duration-500 hover:bg-right hover:bg-clip-padding hover:text-white dark:hover:text-black">
-                    SkillBridge
-                  </span>
-                </SheetTitle>
-              </SheetHeader>
+                </Link>
+              </>
+            )}
 
-              <div className="mt-6 flex flex-col gap-6">
-                <Accordion type="single" collapsible className="space-y-3">
-                  {menu.map((item) => (
-                    <Link
-                      key={item.title}
-                      href={item.url}
-                      className="h-10 justify-center flex flex-col rounded-md px-4 py-2 text-sm font-medium transition-colors duration-300 hover:text-[#611f69] hover:bg-[#611f69]/10 dark:hover:text-[#d8b4fe] dark:hover:bg-white/10"
-                    >
-                      {item.title}
-                    </Link>
-                  ))}
-                </Accordion>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button size="icon" variant="outline">
+                  <Menu className="h-4 w-4" />
+                </Button>
+              </SheetTrigger>
 
-                <div className="flex flex-col gap-3">
-                  {!loading && user ? (
-                    <>
+              <SheetContent className="overflow-y-auto">
+                <SheetHeader>
+                  <SheetTitle className="flex items-center gap-2">
+                    <Image
+                      src="/logo.png"
+                      alt="SkillBridge Logo"
+                      width={32}
+                      height={32}
+                    />
+                    <span className="relative rounded-md px-3 py-1 text-lg font-semibold tracking-tighter bg-linear-to-r from-[#7b2a85] via-[#611f69] to-[#4a174f] dark:from-[#d8b4fe] dark:via-[#c084fc] dark:to-[#a855f7] bg-size-[200%_200%] bg-left bg-clip-text text-transparent transition-all duration-500 hover:bg-right hover:bg-clip-padding hover:text-white dark:hover:text-black">
+                      SkillBridge
+                    </span>
+                  </SheetTitle>
+                </SheetHeader>
+
+                <div className="mt-6 flex flex-col gap-6">
+                  <Accordion type="single" collapsible className="space-y-3">
+                    {menu.map((item) => (
                       <Link
-                        href={"/dashboard"}
-                        className="flex items-center gap-3 px-4"
+                        key={item.title}
+                        href={item.url}
+                        className="h-10 justify-center flex flex-col rounded-md px-4 py-2 text-sm font-medium transition-colors duration-300 hover:text-[#611f69] hover:bg-[#611f69]/10 dark:hover:text-[#d8b4fe] dark:hover:bg-white/10"
                       >
-                        <Image
-                          src={getAvatarUrl(user.image)}
-                          alt="profile"
-                          width={40}
-                          height={40}
-                          className="rounded-full"
-                        />
-                        <span>{user.name}</span>
+                        {item.title}
                       </Link>
+                    ))}
+                  </Accordion>
+
+                  <div className="flex flex-col gap-3">
+                    {!loading && user ? (
+                      <>
+                        <div className="px-4 text-sm text-gray-600 dark:text-gray-300">
+                          Signed in as{" "}
+                          <span className="font-semibold text-gray-900 dark:text-white">
+                            {user.name}
+                          </span>
+                        </div>
                       <Button
                         onClick={() => logout(refetch)}
                         className="bg-red-500 hover:bg-red-600 mx-4"
                       >
                         Logout
                       </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button
-                        asChild
-                        variant="outline"
-                        className="border-[#611f69] text-[#611f69] hover:bg-[#611f69] hover:text-white dark:border-[#611f69]  dark:text-[#e9d5ff] dark:hover:bg-[#611f69] dark:hover:text-white mx-4"
-                      >
-                        <Link href="/login">Sign In</Link>
-                      </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          asChild
+                          variant="outline"
+                          className="border-[#611f69] text-[#611f69] hover:bg-[#611f69] hover:text-white dark:border-[#611f69]  dark:text-[#e9d5ff] dark:hover:bg-[#611f69] dark:hover:text-white mx-4"
+                        >
+                          <Link href="/login">Sign In</Link>
+                        </Button>
 
-                      <Button
-                        asChild
-                        className="bg-[#611f69] text-white hover:bg-[#4a174f] mx-4"
-                      >
-                        <Link href="/sign-up">Sign Up</Link>
-                      </Button>
-                    </>
-                  )}
+                        <Button
+                          asChild
+                          className="bg-[#611f69] text-white hover:bg-[#4a174f] mx-4"
+                        >
+                          <Link href="/sign-up">Sign Up</Link>
+                        </Button>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </SheetContent>
-          </Sheet>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </div>
     </header>

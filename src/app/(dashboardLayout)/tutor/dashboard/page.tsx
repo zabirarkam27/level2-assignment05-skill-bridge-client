@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import RecentNotifications from "@/components/notifications/RecentNotifications";
 
 function StatCard({
   icon,
@@ -125,6 +126,10 @@ export default function TutorDashboardPage() {
         {stats.map((s, i) => (
           <StatCard key={s.label} {...s} index={i} />
         ))}
+      </div>
+
+      <div className="mb-8">
+        <RecentNotifications />
       </div>
 
       {/* Upcoming sessions */}

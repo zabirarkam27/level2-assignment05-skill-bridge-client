@@ -75,6 +75,19 @@ export interface AvailabilitySlot {
 
 export type BookingStatus = "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED";
 export type PaymentStatus = "INITIATED" | "PAID" | "FAILED" | "CANCELLED";
+export type NotificationType =
+  | "BOOKING_CREATED"
+  | "BOOKING_CONFIRMED"
+  | "BOOKING_CANCELLED"
+  | "SESSION_COMPLETED"
+  | "NEW_REVIEW"
+  | "COURSE_ASSIGNED"
+  | "COURSE_DELETE_REQUEST"
+  | "COURSE_DELETE_APPROVED"
+  | "COURSE_DELETE_REJECTED"
+  | "TUTOR_REQUEST_APPROVED"
+  | "TUTOR_REQUEST_REJECTED"
+  | "SYSTEM";
 
 export interface Booking {
   id: string;
@@ -172,6 +185,18 @@ export interface Certificate {
       name: string;
     };
   };
+}
+
+export interface AppNotification {
+  id: string;
+  userId: string;
+  title: string;
+  message: string;
+  type: NotificationType;
+  isRead: boolean;
+  link?: string | null;
+  entityId?: string | null;
+  createdAt: string;
 }
 
 export interface Review {

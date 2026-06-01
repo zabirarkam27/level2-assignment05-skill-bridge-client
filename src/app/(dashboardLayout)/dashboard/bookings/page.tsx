@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import RecentNotifications from "@/components/notifications/RecentNotifications";
 
 const statusVariant: Record<string, "default" | "success" | "destructive" | "warning"> = {
   PENDING: "default",
@@ -283,6 +284,10 @@ export default function StudentBookingsPage() {
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
           View and manage all your tutoring sessions
         </p>
+      </div>
+
+      <div className="mb-6">
+        <RecentNotifications />
       </div>
 
       {/* Filter tabs */}

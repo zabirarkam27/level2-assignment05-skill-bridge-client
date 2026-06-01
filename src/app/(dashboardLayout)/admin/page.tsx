@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import RecentNotifications from "@/components/notifications/RecentNotifications";
 
 function StatCard({
   icon,
@@ -147,6 +148,10 @@ export default function AdminDashboardPage() {
           {cards.map((c, i) => <StatCard key={c.label} {...c} index={i} />)}
         </div>
       )}
+
+      <div className="mt-8">
+        <RecentNotifications />
+      </div>
 
       <div className="mt-8 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6 shadow-sm">
         <h2 className="font-semibold text-gray-900 dark:text-white mb-3">Quick Actions</h2>
