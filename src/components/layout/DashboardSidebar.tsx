@@ -18,6 +18,7 @@ import {
   ArrowLeft,
   UserCheck,
   CreditCard,
+  Award,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLogout } from "@/lib/logout";
@@ -98,6 +99,11 @@ function getNavItems(role?: string): NavItem[] {
         icon: <CreditCard className="w-4 h-4" />,
       },
       {
+        title: "Certificates",
+        href: "/admin/certificates",
+        icon: <Award className="w-4 h-4" />,
+      },
+      {
         title: "Categories",
         href: "/admin/categories",
         icon: <FolderOpen className="w-4 h-4" />,
@@ -125,6 +131,11 @@ function getNavItems(role?: string): NavItem[] {
       title: "Payments",
       href: "/dashboard/payments",
       icon: <CreditCard className="w-4 h-4" />,
+    },
+    {
+      title: "My Certificates",
+      href: "/dashboard/certificates",
+      icon: <Award className="w-4 h-4" />,
     },
     {
       title: "Reviews",

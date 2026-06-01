@@ -12,6 +12,8 @@ import {
   BookOpen,
   CheckCircle2,
   XCircle,
+  Award,
+  Download,
 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -34,12 +36,15 @@ function BookingCard({
   booking,
   index,
   onCancel,
+  onDownloadCertificate,
 }: {
   booking: Booking;
   index: number;
   onCancel: (id: string) => Promise<void>;
+  onDownloadCertificate: (booking: Booking) => Promise<void>;
 }) {
   const [cancelling, setCancelling] = useState(false);
+  const [downloadingCertificate, setDownloadingCertificate] = useState(false);
 
   const handleCancel = async () => {
     setCancelling(true);
@@ -48,6 +53,12 @@ function BookingCard({
   };
 
   const canCancel = booking.status === "CONFIRMED" || booking.status === "PENDING";
+
+  const handleCertificateDownload = async () => {
+    setDownloadingCertificate(true);
+    await onDownloadCertificate(booking);
+    setDownloadingCertificate(false);
+  };
 
   return (
     <motion.div
@@ -93,12 +104,27 @@ function BookingCard({
             {booking.status}
           </Badge>
           {booking.status === "COMPLETED" && (
-            <Link
-              href="/dashboard/reviews"
-              className="text-xs text-[#611f69] dark:text-[#c084fc] hover:underline"
-            >
-              Leave Review
-            </Link>
+            <div className="flex flex-col items-end gap-2">
+              <Button
+                size="sm"
+                disabled={downloadingCertificate}
+                onClick={handleCertificateDownload}
+                className="h-7 bg-[#611f69] px-3 text-xs text-white hover:bg-[#4a174f] dark:bg-[#c084fc] dark:text-black"
+              >
+                {downloadingCertificate ? (
+                  <Award className="mr-1 h-3.5 w-3.5" />
+                ) : (
+                  <Download className="mr-1 h-3.5 w-3.5" />
+                )}
+                Certificate
+              </Button>
+              <Link
+                href="/dashboard/reviews"
+                className="text-xs text-[#611f69] dark:text-[#c084fc] hover:underline"
+              >
+                Leave Review
+              </Link>
+            </div>
           )}
           {canCancel && (
             <Button
@@ -193,6 +219,57 @@ export default function StudentBookingsPage() {
     }
   };
 
+  const downloadCertificate = async (booking: Booking) => {
+    if (!booking.courseId) {
+      toast.error("No course is assigned to this booking.");
+      return;
+    }
+
+    try {
+      const certificateRes = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/certificates/${booking.courseId}`,
+        { credentials: "include" },
+      );
+      const certificateData = await certificateRes.json();
+
+      if (!certificateRes.ok) {
+        throw new Error(
+          certificateData.message || "Certificate is not ready yet",
+        );
+      }
+
+      const certificateId = certificateData.data?.id;
+      const certificateNo = certificateData.data?.certificateNo;
+
+      if (!certificateId) {
+        throw new Error("Certificate is not ready yet");
+      }
+
+      const downloadRes = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/certificates/${certificateId}/download`,
+        { credentials: "include" },
+      );
+
+      if (!downloadRes.ok) {
+        throw new Error("Certificate download failed");
+      }
+
+      const blob = await downloadRes.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `skillbridge-certificate-${certificateNo ?? booking.courseId}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    } catch (error: unknown) {
+      toast.error(
+        error instanceof Error ? error.message : "Certificate download failed",
+      );
+    }
+  };
+
   const filtered =
     filter === "ALL" ? bookings : bookings.filter((b) => b.status === filter);
 
@@ -243,7 +320,13 @@ export default function StudentBookingsPage() {
       ) : (
         <div className="space-y-3">
           {filtered.map((b, i) => (
-            <BookingCard key={b.id} booking={b} index={i} onCancel={cancelBooking} />
+            <BookingCard
+              key={b.id}
+              booking={b}
+              index={i}
+              onCancel={cancelBooking}
+              onDownloadCertificate={downloadCertificate}
+            />
           ))}
         </div>
       )}

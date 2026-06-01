@@ -30,7 +30,7 @@ export const metadata = {
 export default function ContactPage() {
   return (
     <div className="min-h-[80vh] bg-white dark:bg-gray-950">
-      <section className="border-b bg-gradient-to-b from-[#611f69]/5 to-transparent px-6 py-14 dark:from-[#c084fc]/10">
+      <section className="border-b bg-linear-to-b from-[#611f69]/5 to-transparent px-6 py-14 dark:from-[#c084fc]/10">
         <div className="mx-auto max-w-7xl text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#611f69]/10 text-[#611f69] dark:bg-[#c084fc]/15 dark:text-[#c084fc]">
             <MessageCircle className="h-6 w-6" />

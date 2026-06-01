@@ -146,6 +146,34 @@ export interface PaymentHistoryItem {
   } | null;
 }
 
+export interface Certificate {
+  id: string;
+  studentId: string;
+  courseId: string;
+  certificateNo: string;
+  issuedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
+  student?: {
+    id: string;
+    name: string;
+    email: string;
+    image?: string | null;
+  };
+  course?: Course & {
+    tutor?: {
+      id: string;
+      name: string;
+      email?: string;
+      image?: string | null;
+    } | null;
+    category?: {
+      id: string;
+      name: string;
+    };
+  };
+}
+
 export interface Review {
   id: string;
   rating: number; // 1–5
