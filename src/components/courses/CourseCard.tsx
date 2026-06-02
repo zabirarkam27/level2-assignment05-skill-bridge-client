@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Star } from "lucide-react";
 import { Course } from "@/types/routes.type";
+import WishlistToggle from "@/components/wishlist/WishlistToggle";
 
 export const COURSE_PLACEHOLDER_IMAGE =
   "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80";
@@ -41,11 +42,17 @@ export function CourseCard({ course, index = 0 }: CourseCardProps) {
           />
           <motion.div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/30" />
           {course.isPopular && (
-            <span className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-[#611f69] px-2.5 py-1 text-xs font-medium text-white dark:bg-[#c084fc] dark:text-black">
+            <span className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-[#611f69] px-2.5 py-1 text-xs font-medium text-white dark:bg-[#c084fc] dark:text-black">
               <Star className="h-3 w-3 fill-current" />
               Popular
             </span>
           )}
+          <WishlistToggle
+            type="course"
+            id={course.id}
+            count={course._count?.wishlists ?? 0}
+            className="absolute right-3 top-3"
+          />
         </div>
 
         <div className="flex grow flex-col p-6">

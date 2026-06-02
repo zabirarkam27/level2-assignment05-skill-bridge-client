@@ -8,12 +8,14 @@ import {
   GraduationCap,
   Star,
   User,
+  Heart,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Course } from "@/types/routes.type";
 import { COURSE_PLACEHOLDER_IMAGE } from "@/components/courses/CourseCard";
 import { fetchPublicApi } from "@/lib/public-api";
+import WishlistToggle from "@/components/wishlist/WishlistToggle";
 
 type CourseResponse = {
   success: boolean;
@@ -88,6 +90,18 @@ export default async function CourseDetailsPage({
               <h1 className="max-w-3xl text-3xl font-bold leading-tight text-gray-900 dark:text-white md:text-5xl">
                 {course.title}
               </h1>
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <WishlistToggle
+                  type="course"
+                  id={course.id}
+                  count={course._count?.wishlists ?? 0}
+                  className="border-gray-200"
+                />
+                <span className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+                  <Heart className="h-4 w-4 text-red-500" />
+                  {course._count?.wishlists ?? 0} students saved this course
+                </span>
+              </div>
               <p className="mt-5 max-w-3xl text-base leading-7 text-gray-600 dark:text-gray-300">
                 {course.description || "No description available for this course yet."}
               </p>

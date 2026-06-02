@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { getAvatarUrl } from "@/lib/avatar";
 import { fetchPublicApi } from "@/lib/public-api";
+import WishlistToggle from "@/components/wishlist/WishlistToggle";
 
 // MentorCard
 
@@ -30,6 +31,12 @@ export function MentorCard({ tutor, index }: MentorCardProps) {
       >
         {/* top accent bar */}
         <div className="h-1 w-full bg-gradient-to-r from-[#7b2a85] via-[#611f69] to-[#a855f7]" />
+        <WishlistToggle
+          type="tutor"
+          id={tutor.id}
+          count={tutor._count?.wishlists ?? 0}
+          className="absolute right-3 top-4 z-10"
+        />
 
         <div className="p-6 flex flex-col items-center text-center">
           {/* Avatar */}

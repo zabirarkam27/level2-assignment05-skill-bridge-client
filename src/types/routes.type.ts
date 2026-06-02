@@ -46,6 +46,9 @@ export interface Course {
     status: "PENDING" | "APPROVED" | "REJECTED";
     createdAt: string;
   }[];
+  _count?: {
+    wishlists?: number;
+  };
 }
 
 export interface Mentor {
@@ -62,6 +65,9 @@ export interface Mentor {
     assignedCourses?: Course[];
   };
   courses?: Course[];
+  _count?: {
+    wishlists?: number;
+  };
 }
 
 export interface AvailabilitySlot {

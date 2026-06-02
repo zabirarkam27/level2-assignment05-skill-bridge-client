@@ -19,6 +19,7 @@ import {
   UserCheck,
   CreditCard,
   Award,
+  Heart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLogout } from "@/lib/logout";
@@ -136,6 +137,11 @@ function getNavItems(role?: string): NavItem[] {
       title: "My Certificates",
       href: "/dashboard/certificates",
       icon: <Award className="w-4 h-4" />,
+    },
+    {
+      title: "Wishlist",
+      href: "/dashboard/wishlist",
+      icon: <Heart className="w-4 h-4" />,
     },
     {
       title: "Reviews",

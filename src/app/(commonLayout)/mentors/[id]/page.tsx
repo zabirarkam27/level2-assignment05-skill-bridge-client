@@ -13,11 +13,13 @@ import {
   User,
   CalendarDays,
   ArrowLeft,
+  Heart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getAvatarUrl } from "@/lib/avatar";
 import { useSessionContext } from "@/context/SessionContext";
 import Link from "next/link";
+import WishlistToggle from "@/components/wishlist/WishlistToggle";
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -183,9 +185,19 @@ export default function MentorDetailPage() {
                     <BookOpen className="w-4 h-4 text-[#611f69] dark:text-[#c084fc]" />
                     {mentor.subjects.length} subjects
                   </span>
+                  <span className="flex items-center gap-1">
+                    <Heart className="h-4 w-4 text-red-500" />
+                    {mentor._count?.wishlists ?? 0} saved
+                  </span>
                 </div>
               </div>
               <div className="text-right">
+                <WishlistToggle
+                  type="tutor"
+                  id={mentor.id}
+                  count={mentor._count?.wishlists ?? 0}
+                  className="mb-3 border-gray-200"
+                />
                 <p className="text-2xl font-bold text-[#611f69] dark:text-[#c084fc]">
                   ৳ {mentor.price}
                   <span className="text-sm font-normal text-gray-400">/hr</span>
