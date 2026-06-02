@@ -102,6 +102,9 @@ export interface Booking {
   courseId?: string | null;
   dateTime: string; // ISO datetime string from API
   status: BookingStatus;
+  googleEventId?: string | null;
+  googleEventCreatorUserId?: string | null;
+  meetingLink?: string | null;
   createdAt: string;
   course?: Course | null;
   tutor?: Mentor;

@@ -5,7 +5,7 @@ import { Booking, BookingStatus } from "@/types/routes.type";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { CalendarDays, Clock, CheckCircle2, Check, BookOpen } from "lucide-react";
+import { CalendarDays, Clock, CheckCircle2, Check, BookOpen, Video } from "lucide-react";
 import { motion } from "framer-motion";
 
 const statusVariant: Record<BookingStatus, "default" | "warning" | "success" | "destructive"> = {
@@ -59,8 +59,12 @@ export default function TutorSessionsPage() {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.message || "Request failed");
       }
+      const responseData = await res.json().catch(() => ({}));
+      const updatedBooking = responseData.data as Booking | undefined;
       setBookings((b) =>
-        b.map((bk) => (bk.id === id ? { ...bk, status } : bk)),
+        b.map((bk) =>
+          bk.id === id ? { ...bk, ...(updatedBooking ?? {}), status } : bk,
+        ),
       );
       toast.success(
         status === "CONFIRMED"
@@ -159,6 +163,18 @@ export default function TutorSessionsPage() {
             >
               <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
               {actionId === b.id ? "..." : "Complete"}
+            </Button>
+          )}
+          {b.status === "CONFIRMED" && b.meetingLink && (
+            <Button
+              size="sm"
+              asChild
+              className="h-7 bg-emerald-600 px-3 text-xs text-white hover:bg-emerald-700"
+            >
+              <a href={b.meetingLink} target="_blank" rel="noreferrer">
+                <Video className="mr-1 h-3.5 w-3.5" />
+                Join Meet
+              </a>
             </Button>
           )}
         </div>

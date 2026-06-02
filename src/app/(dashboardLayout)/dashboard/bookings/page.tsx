@@ -14,6 +14,8 @@ import {
   XCircle,
   Award,
   Download,
+  Video,
+  CalendarPlus,
 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -31,6 +33,35 @@ const statusIcon: Record<string, React.ReactNode> = {
   CONFIRMED: <Clock className="w-3.5 h-3.5" />,
   COMPLETED: <CheckCircle2 className="w-3.5 h-3.5" />,
   CANCELLED: <XCircle className="w-3.5 h-3.5" />,
+};
+
+const toGoogleCalendarDate = (date: Date) => {
+  return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
+};
+
+const buildGoogleCalendarUrl = (booking: Booking) => {
+  const startDate = new Date(booking.dateTime);
+  const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
+  const courseTitle = booking.course?.title ?? "SkillBridge Session";
+  const tutorName = booking.tutor?.user.name ?? "Tutor";
+  const details = [
+    `SkillBridge tutoring session with ${tutorName}.`,
+    booking.course?.category?.name ? `Category: ${booking.course.category.name}` : "",
+    booking.meetingLink ? `Google Meet: ${booking.meetingLink}` : "",
+  ].filter(Boolean).join("\n");
+
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: `${courseTitle} Session`,
+    dates: `${toGoogleCalendarDate(startDate)}/${toGoogleCalendarDate(endDate)}`,
+    details,
+  });
+
+  if (booking.meetingLink) {
+    params.set("location", booking.meetingLink);
+  }
+
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
 };
 
 function BookingCard({
@@ -54,6 +85,7 @@ function BookingCard({
   };
 
   const canCancel = booking.status === "CONFIRMED" || booking.status === "PENDING";
+  const googleCalendarUrl = buildGoogleCalendarUrl(booking);
 
   const handleCertificateDownload = async () => {
     setDownloadingCertificate(true);
@@ -126,6 +158,39 @@ function BookingCard({
                 Leave Review
               </Link>
             </div>
+          )}
+          {booking.status === "CONFIRMED" && booking.meetingLink && (
+            <Button
+              size="sm"
+              asChild
+              className="h-7 bg-emerald-600 px-3 text-xs text-white hover:bg-emerald-700"
+            >
+              <a
+                href={booking.meetingLink}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Video className="mr-1 h-3.5 w-3.5" />
+                Join Meet
+              </a>
+            </Button>
+          )}
+          {booking.status === "CONFIRMED" && (
+            <Button
+              size="sm"
+              asChild
+              variant="outline"
+              className="h-7 px-3 text-xs"
+            >
+              <a
+                href={googleCalendarUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <CalendarPlus className="mr-1 h-3.5 w-3.5" />
+                Add To Calendar
+              </a>
+            </Button>
           )}
           {canCancel && (
             <Button

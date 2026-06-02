@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Booking, BookingStatus } from "@/types/routes.type";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Search } from "lucide-react";
+import { BookOpen, Search, Video } from "lucide-react";
 import { motion } from "framer-motion";
 
 const statusVariant: Record<
@@ -154,6 +154,17 @@ export default function AdminBookingsPage() {
                           </span>
                         )}
                       </div>
+                    )}
+                    {booking.status === "CONFIRMED" && booking.meetingLink && (
+                      <a
+                        href={booking.meetingLink}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-emerald-600 hover:underline"
+                      >
+                        <Video className="h-3.5 w-3.5" />
+                        Join Google Meet
+                      </a>
                     )}
                   </div>
                   <Badge variant={statusVariant[booking.status]}>
