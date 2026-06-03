@@ -25,6 +25,7 @@ import {
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { UserPlus } from "lucide-react";
 import ConfirmActionDialog from "@/components/ConfirmActionDialog";
 
@@ -89,9 +90,10 @@ function DeleteDialog({
 }
 
 export default function AdminUsersPage() {
+  const searchParams = useSearchParams();
   const [users, setUsers] = useState<AppUser[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(() => searchParams.get("search") ?? "");
   const [activeTab, setActiveTab] = useState<UserTab>("ALL");
   const [updating, setUpdating] = useState<string | null>(null);
   const [undoTarget, setUndoTarget] = useState<AppUser | null>(null);
@@ -113,6 +115,10 @@ export default function AdminUsersPage() {
   };
 
   useEffect(() => { fetchUsers(); }, []);
+
+  useEffect(() => {
+    setSearch(searchParams.get("search") ?? "");
+  }, [searchParams]);
 
   const toggleBan = async (userId: string, currentStatus: string) => {
     setUpdating(userId);

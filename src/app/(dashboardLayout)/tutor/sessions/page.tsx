@@ -7,6 +7,12 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { CalendarDays, Clock, CheckCircle2, Check, BookOpen, Video } from "lucide-react";
 import { motion } from "framer-motion";
+import {
+  canCompleteBooking,
+  canConfirmBooking,
+  hasSessionStarted,
+  isBookingPaymentPaid,
+} from "@/lib/booking-rules";
 
 const statusVariant: Record<BookingStatus, "default" | "warning" | "success" | "destructive"> = {
   PENDING: "default",
@@ -14,8 +20,6 @@ const statusVariant: Record<BookingStatus, "default" | "warning" | "success" | "
   COMPLETED: "success",
   CANCELLED: "destructive",
 };
-
-const isPaymentPaid = (booking: Booking) => booking.payment?.status === "PAID";
 
 export default function TutorSessionsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -90,8 +94,18 @@ export default function TutorSessionsPage() {
   }, {});
 
   const renderBookingCard = (b: Booking, i: number) => {
-    const paymentPaid = isPaymentPaid(b);
+    const paymentPaid = isBookingPaymentPaid(b);
+    const confirmAllowed = canConfirmBooking(b);
+    const completeAllowed = canCompleteBooking(b);
     const paymentLabel = paymentPaid ? "Payment verified" : "Payment pending";
+    const completeTitle = completeAllowed
+      ? "Mark this finished session as completed"
+      : "Session can be completed after its scheduled time";
+    const confirmTitle = !paymentPaid
+      ? "Payment must be completed before confirmation"
+      : hasSessionStarted(b)
+        ? "Past sessions cannot be confirmed"
+        : "Confirm this paid booking";
 
     return (
       <motion.div
@@ -141,12 +155,8 @@ export default function TutorSessionsPage() {
           {b.status === "PENDING" && (
             <Button
               size="sm"
-              disabled={actionId === b.id || !paymentPaid}
-              title={
-                paymentPaid
-                  ? "Confirm this paid booking"
-                  : "Payment must be completed before confirmation"
-              }
+              disabled={actionId === b.id || !confirmAllowed}
+              title={confirmTitle}
               onClick={() => updateStatus(b.id, "CONFIRMED")}
               className="text-xs bg-[#611f69] text-white hover:bg-[#4a174f] dark:bg-[#c084fc] dark:text-black h-7 px-3 disabled:cursor-not-allowed disabled:opacity-60"
             >
@@ -157,9 +167,10 @@ export default function TutorSessionsPage() {
           {b.status === "CONFIRMED" && (
             <Button
               size="sm"
-              disabled={actionId === b.id}
+              disabled={actionId === b.id || !completeAllowed}
+              title={completeTitle}
               onClick={() => updateStatus(b.id, "COMPLETED")}
-              className="text-xs bg-green-600 text-white hover:bg-green-700 h-7 px-3"
+              className="text-xs bg-green-600 text-white hover:bg-green-700 h-7 px-3 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
               {actionId === b.id ? "..." : "Complete"}

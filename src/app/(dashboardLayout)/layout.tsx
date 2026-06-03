@@ -2,6 +2,7 @@
 
 import { useSessionContext } from "@/context/SessionContext";
 import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
@@ -10,6 +11,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useLogout } from "@/lib/logout";
 import GlobalSearch from "@/components/search/GlobalSearch";
+import NotificationBell from "@/components/notifications/NotificationBell";
 
 function PendingScreen() {
   const { refetch } = useSessionContext();
@@ -175,13 +177,26 @@ export default function DashboardLayout({
           >
             <Menu className="w-5 h-5" />
           </button>
-          <span className="font-semibold text-[#611f69] dark:text-[#c084fc]">
+          <Link
+            href="/"
+            className="font-semibold text-[#611f69] transition-colors hover:text-[#4a174f] dark:text-[#c084fc] dark:hover:text-[#d8b4fe]"
+          >
             SkillBridge
-          </span>
+          </Link>
+          <div className="ml-auto">
+            <NotificationBell />
+          </div>
         </div>
 
         <div className="border-b border-gray-200 bg-white px-4 py-4 dark:border-gray-800 dark:bg-gray-950 sm:px-6">
-          <GlobalSearch />
+          <div className="flex items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <GlobalSearch canSearchUsers={user.role === "ADMIN"} />
+            </div>
+            <div className="hidden lg:block">
+              <NotificationBell />
+            </div>
+          </div>
         </div>
 
         <main className="min-w-0 flex-1 overflow-x-hidden p-4 sm:p-6">

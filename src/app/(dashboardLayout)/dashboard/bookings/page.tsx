@@ -20,6 +20,7 @@ import {
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import RecentNotifications from "@/components/notifications/RecentNotifications";
+import { canStudentCancelBooking } from "@/lib/booking-rules";
 
 const statusVariant: Record<string, "default" | "success" | "destructive" | "warning"> = {
   PENDING: "default",
@@ -84,7 +85,7 @@ function BookingCard({
     setCancelling(false);
   };
 
-  const canCancel = booking.status === "CONFIRMED" || booking.status === "PENDING";
+  const canCancel = canStudentCancelBooking(booking);
   const googleCalendarUrl = buildGoogleCalendarUrl(booking);
 
   const handleCertificateDownload = async () => {
@@ -275,13 +276,18 @@ export default function StudentBookingsPage() {
           body: JSON.stringify({ status: "CANCELLED" }),
         },
       );
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || "Failed to cancel booking.");
+      }
       setBookings((prev) =>
         prev.map((b) => (b.id === id ? { ...b, status: "CANCELLED" } : b)),
       );
       toast.success("Booking cancelled.");
-    } catch {
-      toast.error("Failed to cancel booking.");
+    } catch (error: unknown) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to cancel booking.",
+      );
     }
   };
 

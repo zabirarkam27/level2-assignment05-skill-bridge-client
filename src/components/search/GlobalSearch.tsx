@@ -9,28 +9,31 @@ type SearchItem = {
   title: string;
   subtitle: string;
   href: string;
-  type: "Tutor" | "Course" | "Category";
+  type: "Tutor" | "Course" | "Category" | "User";
 };
 
 type SearchResponse = {
   tutors: SearchItem[];
   courses: SearchItem[];
   categories: SearchItem[];
+  users: SearchItem[];
 };
 
 const emptyResults: SearchResponse = {
   tutors: [],
   courses: [],
   categories: [],
+  users: [],
 };
 
 const iconByType = {
   Tutor: UserRound,
   Course: BookOpen,
   Category: FolderOpen,
+  User: UserRound,
 };
 
-export default function GlobalSearch() {
+export default function GlobalSearch({ canSearchUsers = false }: { canSearchUsers?: boolean }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResponse>(emptyResults);
   const [loading, setLoading] = useState(false);
@@ -39,11 +42,12 @@ export default function GlobalSearch() {
 
   const groups = useMemo(
     () => [
+      ...(canSearchUsers ? [{ label: "Users", items: results.users }] : []),
       { label: "Tutors", items: results.tutors },
       { label: "Courses", items: results.courses },
       { label: "Categories", items: results.categories },
     ],
-    [results],
+    [canSearchUsers, results],
   );
   const hasResults = groups.some((group) => group.items.length > 0);
 
@@ -73,10 +77,10 @@ export default function GlobalSearch() {
         setLoading(true);
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/search?q=${encodeURIComponent(trimmedQuery)}`,
-          { signal: controller.signal },
+          { credentials: "include", signal: controller.signal },
         );
         const data = await res.json();
-        setResults(data.data ?? emptyResults);
+        setResults({ ...emptyResults, ...(data.data ?? {}) });
         setOpen(true);
       } catch (error) {
         if (!(error instanceof DOMException && error.name === "AbortError")) {
@@ -104,7 +108,7 @@ export default function GlobalSearch() {
             setOpen(true);
           }}
           onFocus={() => setOpen(true)}
-          placeholder="Search anything..."
+          placeholder={canSearchUsers ? "Search anything, users by email..." : "Search anything..."}
           className="h-11 w-full rounded-xl border border-gray-200 bg-white pl-10 pr-4 text-sm text-gray-900 shadow-sm outline-none transition focus:border-[#611f69] focus:ring-2 focus:ring-[#611f69]/15 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
         />
       </div>

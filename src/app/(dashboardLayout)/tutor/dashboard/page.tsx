@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Card } from "@tremor/react";
 import {
   Area,
   AreaChart,
@@ -26,6 +25,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import RecentNotifications from "@/components/notifications/RecentNotifications";
+import { cn } from "@/lib/utils";
 
 const money = (value: number) =>
   new Intl.NumberFormat("en-BD", {
@@ -35,6 +35,16 @@ const money = (value: number) =>
   }).format(value);
 
 const monthKey = (date: Date) => `${date.getFullYear()}-${date.getMonth()}`;
+
+function Card({
+  className,
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return <section className={cn(className)}>{children}</section>;
+}
 
 function StatCard({
   icon,

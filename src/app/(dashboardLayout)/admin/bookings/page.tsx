@@ -3,8 +3,17 @@
 import { useEffect, useState } from "react";
 import { Booking, BookingStatus } from "@/types/routes.type";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Search, Video } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { BookOpen, Check, CheckCircle2, Search, Video, XCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
+import {
+  canAdminCancelBooking,
+  canCompleteBooking,
+  canConfirmBooking,
+  hasSessionStarted,
+  isBookingPaymentPaid,
+} from "@/lib/booking-rules";
 
 const statusVariant: Record<
   BookingStatus,
@@ -16,13 +25,12 @@ const statusVariant: Record<
   CANCELLED: "destructive",
 };
 
-const isPaymentPaid = (booking: Booking) => booking.payment?.status === "PAID";
-
 export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<BookingStatus | "ALL">("ALL");
+  const [actionId, setActionId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -53,6 +61,49 @@ export default function AdminBookingsPage() {
         b.course?.category?.name?.toLowerCase().includes(q)
       );
     });
+
+  const updateStatus = async (
+    booking: Booking,
+    status: "CONFIRMED" | "COMPLETED" | "CANCELLED",
+  ) => {
+    setActionId(`${booking.id}-${status}`);
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/bookings/${booking.id}/status`,
+        {
+          method: "PATCH",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status }),
+        },
+      );
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || "Failed to update booking.");
+      }
+
+      const responseData = await res.json().catch(() => ({}));
+      const updatedBooking = responseData.data as Booking | undefined;
+
+      setBookings((prev) =>
+        prev.map((item) =>
+          item.id === booking.id
+            ? { ...item, ...(updatedBooking ?? {}), status }
+            : item,
+        ),
+      );
+
+      toast.success(`Booking marked as ${status.toLowerCase()}.`);
+    } catch (error: unknown) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update booking.",
+      );
+    } finally {
+      setActionId(null);
+    }
+  };
 
   return (
     <div>
@@ -114,7 +165,15 @@ export default function AdminBookingsPage() {
         ) : (
           <div className="divide-y divide-gray-100 dark:divide-gray-700">
             {filtered.map((booking, i) => {
-              const paymentPaid = isPaymentPaid(booking);
+              const paymentPaid = isBookingPaymentPaid(booking);
+              const confirmAllowed = canConfirmBooking(booking);
+              const completeAllowed = canCompleteBooking(booking);
+              const cancelAllowed = canAdminCancelBooking(booking);
+              const confirmTitle = !paymentPaid
+                ? "Payment must be completed before confirmation"
+                : hasSessionStarted(booking)
+                  ? "Past sessions cannot be confirmed"
+                  : "Confirm this paid booking";
 
               return (
                 <motion.div
@@ -167,9 +226,52 @@ export default function AdminBookingsPage() {
                       </a>
                     )}
                   </div>
-                  <Badge className="self-start sm:self-center" variant={statusVariant[booking.status]}>
-                    {booking.status}
-                  </Badge>
+                  <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:flex-col sm:items-end">
+                    <Badge className="self-start sm:self-center" variant={statusVariant[booking.status]}>
+                      {booking.status}
+                    </Badge>
+                    {booking.status === "PENDING" && (
+                      <Button
+                        size="sm"
+                        disabled={actionId !== null || !confirmAllowed}
+                        title={confirmTitle}
+                        onClick={() => updateStatus(booking, "CONFIRMED")}
+                        className="h-7 px-3 text-xs bg-[#611f69] text-white hover:bg-[#4a174f] disabled:cursor-not-allowed disabled:opacity-60 dark:bg-[#c084fc] dark:text-black"
+                      >
+                        <Check className="mr-1 h-3.5 w-3.5" />
+                        {actionId === `${booking.id}-CONFIRMED` ? "..." : "Confirm"}
+                      </Button>
+                    )}
+                    {booking.status === "CONFIRMED" && (
+                      <Button
+                        size="sm"
+                        disabled={actionId !== null || !completeAllowed}
+                        title={
+                          completeAllowed
+                            ? "Mark this finished session as completed"
+                            : "Session can be completed after its scheduled time"
+                        }
+                        onClick={() => updateStatus(booking, "COMPLETED")}
+                        className="h-7 px-3 text-xs bg-green-600 text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        <CheckCircle2 className="mr-1 h-3.5 w-3.5" />
+                        {actionId === `${booking.id}-COMPLETED` ? "..." : "Complete"}
+                      </Button>
+                    )}
+                    {cancelAllowed && (
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        disabled={actionId !== null}
+                        title="Admins can cancel pending or confirmed bookings"
+                        onClick={() => updateStatus(booking, "CANCELLED")}
+                        className="h-7 px-3 text-xs"
+                      >
+                        <XCircle className="mr-1 h-3.5 w-3.5" />
+                        {actionId === `${booking.id}-CANCELLED` ? "..." : "Cancel"}
+                      </Button>
+                    )}
+                  </div>
                 </motion.div>
               );
             })}

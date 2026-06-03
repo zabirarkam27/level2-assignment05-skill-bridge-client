@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Card } from "@tremor/react";
 import {
   Area,
   AreaChart,
@@ -29,6 +28,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import RecentNotifications from "@/components/notifications/RecentNotifications";
+import { cn } from "@/lib/utils";
 
 type AdminStats = {
   totalUsers: number;
@@ -80,6 +80,23 @@ const money = (value: number) =>
     currency: "BDT",
     maximumFractionDigits: 0,
   }).format(value);
+
+const quickActions = [
+  { label: "Manage Users", href: "/admin/users" },
+  { label: "View Bookings", href: "/admin/bookings" },
+  { label: "Manage Courses", href: "/admin/courses" },
+  { label: "Payments", href: "/admin/payments" },
+];
+
+function Card({
+  className,
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return <section className={cn(className)}>{children}</section>;
+}
 
 function StatCard({
   icon,
@@ -191,6 +208,24 @@ export default function AdminDashboardPage() {
         <Button asChild className="bg-[#611f69] text-white hover:bg-[#4a174f] dark:bg-[#c084fc] dark:text-black">
           <Link href="/">Back to Website</Link>
         </Button>
+      </div>
+
+      <div className="mb-6 rounded-xl border border-gray-100 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+        <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
+          <TrendingUp className="h-4 w-4 text-[#611f69] dark:text-[#c084fc]" />
+          Quick Actions
+        </h2>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {quickActions.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="rounded-lg border border-gray-200 px-4 py-3 text-sm font-medium text-gray-700 transition hover:border-[#611f69] hover:bg-[#611f69]/5 dark:border-gray-700 dark:text-gray-300"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
       </div>
 
       {loading ? (
@@ -305,25 +340,6 @@ export default function AdminDashboardPage() {
                 </BarChart>
               </ResponsiveContainer>
             </ChartCard>
-          </div>
-
-          <div className="mt-6 rounded-xl border border-gray-100 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-            <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
-              <TrendingUp className="h-4 w-4 text-[#611f69] dark:text-[#c084fc]" />
-              Quick Actions
-            </h2>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              {[
-                { label: "Manage Users", href: "/admin/users" },
-                { label: "View Bookings", href: "/admin/bookings" },
-                { label: "Manage Courses", href: "/admin/courses" },
-                { label: "Payments", href: "/admin/payments" },
-              ].map((item) => (
-                <Link key={item.href} href={item.href} className="rounded-lg border border-gray-200 px-4 py-3 text-sm font-medium text-gray-700 transition hover:border-[#611f69] hover:bg-[#611f69]/5 dark:border-gray-700 dark:text-gray-300">
-                  {item.label}
-                </Link>
-              ))}
-            </div>
           </div>
         </>
       )}

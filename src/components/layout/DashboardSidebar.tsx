@@ -175,6 +175,15 @@ export function DashboardSidebar() {
 
   return (
     <aside className="w-64 min-h-screen bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+      <div className="border-b border-gray-200 p-6 dark:border-gray-700">
+        <Link
+          href="/"
+          className="text-lg font-bold text-[#611f69] transition-colors hover:text-[#4a174f] dark:text-[#c084fc] dark:hover:text-[#d8b4fe]"
+        >
+          SkillBridge
+        </Link>
+      </div>
+
       {/* User info */}
       <div className="p-6 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-3">

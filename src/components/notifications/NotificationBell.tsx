@@ -101,7 +101,7 @@ export default function NotificationBell({ enabled = true }: { enabled?: boolean
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80 p-2">
+      <DropdownMenuContent align="end" className="w-[calc(100vw-2rem)] max-w-80 p-2">
         <div className="flex items-center justify-between px-2 py-2">
           <div>
             <p className="text-sm font-semibold text-gray-900 dark:text-white">
