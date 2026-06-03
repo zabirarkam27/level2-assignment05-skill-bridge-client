@@ -201,7 +201,7 @@ export default function AdminTutorRequestsPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: i * 0.05 }}
-                className="flex items-start gap-4 px-5 py-5 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                className="flex flex-col gap-4 px-4 py-5 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50 sm:flex-row sm:items-start sm:px-5"
               >
                 <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 mt-0.5">
                   <Image src={getAvatarUrl(tutor.image)} alt={tutor.name} width={40} height={40} className="object-cover w-full h-full" />
@@ -248,14 +248,14 @@ export default function AdminTutorRequestsPage() {
                   )}
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex w-full shrink-0 items-center gap-2 sm:w-auto">
                   <Button
                     size="sm"
                     disabled={updating === tutor.id}
                     onClick={() =>
                       setPendingAction({ type: "approve", tutor })
                     }
-                    className="h-8 text-xs bg-green-600 hover:bg-green-700 text-white"
+                    className="h-8 flex-1 bg-green-600 text-xs text-white hover:bg-green-700 sm:flex-none"
                   >
                     {updating === tutor.id ? "…" : <><UserCheck className="w-3.5 h-3.5 mr-1" />Approve</>}
                   </Button>
@@ -264,7 +264,7 @@ export default function AdminTutorRequestsPage() {
                     variant="outline"
                     disabled={updating === tutor.id}
                     onClick={() => setPendingAction({ type: "reject", tutor })}
-                    className="h-8 text-xs border-red-400 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
+                    className="h-8 flex-1 border-red-400 text-xs text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 sm:flex-none"
                   >
                     {updating === tutor.id ? "…" : <><UserX className="w-3.5 h-3.5 mr-1" />Reject</>}
                   </Button>
@@ -286,7 +286,7 @@ export default function AdminTutorRequestsPage() {
           </DialogHeader>
 
           <div className="space-y-4 py-2">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid gap-3 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Full Name</label>
                 <Input
@@ -317,7 +317,7 @@ export default function AdminTutorRequestsPage() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid gap-3 sm:grid-cols-2">
               <CategorySubjectPicker
                 value={form.subjects}
                 onChange={(subjects) => setForm((f) => ({ ...f, subjects }))}
@@ -397,7 +397,7 @@ export default function AdminTutorRequestsPage() {
             onClick={copyPassword}
           >
             <p className="text-xs text-gray-400 uppercase tracking-widest mb-1">Temporary Password</p>
-            <p className="text-2xl font-mono font-bold text-[#611f69] dark:text-[#c084fc] tracking-tight break-all">
+            <p className="break-all font-mono text-xl font-bold tracking-tight text-[#611f69] dark:text-[#c084fc] sm:text-2xl">
               {generatedPassword}
             </p>
           </div>

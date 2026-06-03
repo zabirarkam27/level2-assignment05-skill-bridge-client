@@ -225,17 +225,17 @@ export default function AdminUsersPage() {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="relative">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="relative w-full sm:w-auto">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search users..."
-              className="pl-9 pr-4 py-2 text-sm border border-input rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-[#611f69]/40 dark:focus:ring-[#c084fc]/40 w-56"
+              className="w-full rounded-lg border border-input bg-background py-2 pl-9 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#611f69]/40 dark:focus:ring-[#c084fc]/40 sm:w-56"
             />
           </div>
-          <Button asChild className="bg-[#611f69] hover:bg-[#4a174f] text-white dark:bg-[#c084fc] dark:text-black">
+          <Button asChild className="w-full bg-[#611f69] text-white hover:bg-[#4a174f] dark:bg-[#c084fc] dark:text-black sm:w-auto">
             <Link href="/admin/users/mentors">
               <UserPlus className="w-4 h-4 mr-2" /> Manage Mentors
             </Link>
@@ -287,21 +287,21 @@ export default function AdminUsersPage() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: i * 0.03 }}
-                  className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                  className="flex flex-col gap-4 px-4 py-4 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50 sm:flex-row sm:items-center sm:px-5"
                 >
-                  {/* Avatar */}
-                  <div className="w-10 h-10 rounded-full overflow-hidden shrink-0">
-                    <Image src={user.image||"/avatar.svg"} alt={user.name} width={40} height={40} className="object-cover w-full h-full" />
-                  </div>
+                  <div className="flex min-w-0 flex-1 items-center gap-3">
+                    <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
+                      <Image src={user.image||"/avatar.svg"} alt={user.name} width={40} height={40} className="h-full w-full object-cover" />
+                    </div>
 
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
-                      {user.name}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                      {user.email}
-                    </p>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-gray-900 dark:text-white">
+                        {user.name}
+                      </p>
+                      <p className="truncate text-xs text-gray-500 dark:text-gray-400">
+                        {user.email}
+                      </p>
+                    </div>
                   </div>
 
                   {/* Role */}
@@ -325,13 +325,13 @@ export default function AdminUsersPage() {
 
                   {/* Actions */}
                   {user.role !== "ADMIN" && (
-                    <div className="flex items-center gap-2">
+                    <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
                       <Button
                         size="sm"
                         variant="outline"
                         disabled={updating === user.id}
                         onClick={() => setStatusTarget(user)}
-                        className={`text-xs h-8 ${user.status === "BANNED"
+                        className={`h-8 flex-1 text-xs sm:flex-none ${user.status === "BANNED"
                           ? "border-green-500 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20"
                           : "border-red-400 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
                           }`}
@@ -349,7 +349,7 @@ export default function AdminUsersPage() {
                           variant="outline"
                           disabled={updating === user.id}
                           onClick={() => setUndoTarget(user)}
-                          className="h-8 border-amber-400 text-xs text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20"
+                          className="h-8 flex-1 border-amber-400 text-xs text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 sm:flex-none"
                         >
                           <GraduationCap className="mr-1 h-3.5 w-3.5" />
                           Undo Tutor

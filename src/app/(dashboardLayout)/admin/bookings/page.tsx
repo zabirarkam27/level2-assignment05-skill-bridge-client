@@ -66,13 +66,13 @@ export default function AdminBookingsPage() {
             {bookings.length} total bookings
           </p>
         </div>
-        <div className="relative">
+        <div className="relative w-full sm:w-auto">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search..."
-            className="pl-9 pr-4 py-2 text-sm border border-input rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-[#611f69]/40 w-52"
+            className="w-full rounded-lg border border-input bg-background py-2 pl-9 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#611f69]/40 sm:w-52"
           />
         </div>
       </div>
@@ -122,7 +122,7 @@ export default function AdminBookingsPage() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: i * 0.03 }}
-                  className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                  className="flex flex-col gap-4 px-4 py-4 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50 sm:flex-row sm:items-center sm:px-5"
                 >
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -167,7 +167,7 @@ export default function AdminBookingsPage() {
                       </a>
                     )}
                   </div>
-                  <Badge variant={statusVariant[booking.status]}>
+                  <Badge className="self-start sm:self-center" variant={statusVariant[booking.status]}>
                     {booking.status}
                   </Badge>
                 </motion.div>

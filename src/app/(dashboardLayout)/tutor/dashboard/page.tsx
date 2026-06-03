@@ -1,46 +1,67 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { Card } from "@tremor/react";
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { Booking } from "@/types/routes.type";
 import { Badge } from "@/components/ui/badge";
-import { motion } from "framer-motion";
 import {
-  LayoutDashboard,
   CalendarDays,
-  Star,
-  Users,
+  CheckCircle2,
   Clock,
+  LayoutDashboard,
+  Users,
+  Wallet,
 } from "lucide-react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import RecentNotifications from "@/components/notifications/RecentNotifications";
+
+const money = (value: number) =>
+  new Intl.NumberFormat("en-BD", {
+    style: "currency",
+    currency: "BDT",
+    maximumFractionDigits: 0,
+  }).format(value);
+
+const monthKey = (date: Date) => `${date.getFullYear()}-${date.getMonth()}`;
 
 function StatCard({
   icon,
   label,
   value,
-  color,
-  index,
+  helper,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string | number;
-  color: string;
-  index: number;
+  helper: string;
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
-      className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-5 shadow-sm"
-    >
-      <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 ${color}`}>
-        {icon}
+    <Card className="min-w-0 rounded-xl border border-gray-100 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{label}</p>
+          <p className="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
+            {value}
+          </p>
+          <p className="mt-1 text-xs text-gray-400">{helper}</p>
+        </div>
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#611f69]/10 text-[#611f69] dark:bg-[#c084fc]/15 dark:text-[#c084fc]">
+          {icon}
+        </div>
       </div>
-      <p className="text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
-      <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{label}</p>
-    </motion.div>
+    </Card>
   );
 }
 
@@ -51,10 +72,9 @@ export default function TutorDashboardPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/bookings`,
-          { credentials: "include" },
-        );
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bookings`, {
+          credentials: "include",
+        });
         const data = await res.json();
         setBookings(Array.isArray(data.data) ? data.data : []);
       } catch {
@@ -63,112 +83,195 @@ export default function TutorDashboardPage() {
         setLoading(false);
       }
     };
+
     fetchData();
   }, []);
 
-  const completed = bookings.filter((b) => b.status === "COMPLETED").length;
-  const confirmed = bookings.filter((b) => b.status === "CONFIRMED").length;
-  const uniqueStudents = new Set(bookings.map((b) => b.studentId)).size;
+  const analytics = useMemo(() => {
+    const now = new Date();
+    const paidBookings = bookings.filter((booking) => booking.payment?.status === "PAID");
+    const completed = bookings.filter((booking) => booking.status === "COMPLETED");
+    const upcoming = bookings
+      .filter((booking) => booking.status === "CONFIRMED" && new Date(booking.dateTime) >= now)
+      .sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime());
+    const uniqueStudents = new Set(bookings.map((booking) => booking.studentId)).size;
+    const monthlyStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const monthlyEarnings = paidBookings
+      .filter((booking) => booking.payment && new Date(booking.payment.createdAt) >= monthlyStart)
+      .reduce((sum, booking) => sum + (booking.payment?.amount ?? 0), 0);
 
-  const stats = [
-    {
-      icon: <CalendarDays className="w-5 h-5 text-blue-600" />,
-      label: "Total Sessions",
-      value: bookings.length,
-      color: "bg-blue-100 dark:bg-blue-900/30",
-    },
-    {
-      icon: <Clock className="w-5 h-5 text-yellow-600" />,
-      label: "Upcoming",
-      value: confirmed,
-      color: "bg-yellow-100 dark:bg-yellow-900/30",
-    },
-    {
-      icon: <Star className="w-5 h-5 text-green-600" />,
-      label: "Completed",
-      value: completed,
-      color: "bg-green-100 dark:bg-green-900/30",
-    },
-    {
-      icon: <Users className="w-5 h-5 text-purple-600" />,
-      label: "Students",
-      value: uniqueStudents,
-      color: "bg-purple-100 dark:bg-purple-900/30",
-    },
-  ];
+    const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+    const monthFormatter = new Intl.DateTimeFormat("en", { month: "short" });
+    const earningsChart = Array.from({ length: 6 }, (_, index) => {
+      const date = new Date(sixMonthsAgo);
+      date.setMonth(sixMonthsAgo.getMonth() + index);
+      const key = monthKey(date);
+      const total = paidBookings
+        .filter((booking) => {
+          if (!booking.payment) return false;
+          return monthKey(new Date(booking.payment.createdAt)) === key;
+        })
+        .reduce((sum, booking) => sum + (booking.payment?.amount ?? 0), 0);
 
-  const upcoming = bookings
-    .filter((b) => b.status === "CONFIRMED")
-    .slice(0, 5);
+      return {
+        month: monthFormatter.format(date),
+        earnings: total,
+      };
+    });
+
+    const sessionChart = ["PENDING", "CONFIRMED", "COMPLETED", "CANCELLED"].map((status) => ({
+      status,
+      count: bookings.filter((booking) => booking.status === status).length,
+    }));
+
+    return {
+      monthlyEarnings,
+      completedSessions: completed.length,
+      upcomingSessions: upcoming.length,
+      uniqueStudents,
+      earningsChart,
+      sessionChart,
+      upcoming,
+    };
+  }, [bookings]);
 
   return (
     <div>
-      <div className="mb-6 flex justify-between items-center">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <LayoutDashboard className="w-6 h-6 text-[#611f69] dark:text-[#c084fc]" />
-            Tutor Dashboard
+          <h1 className="flex items-center gap-2 text-2xl font-bold text-gray-900 dark:text-white">
+            <LayoutDashboard className="h-6 w-6 text-[#611f69] dark:text-[#c084fc]" />
+            Tutor Analytics
           </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Overview of your teaching activity
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Earnings, completed sessions, upcoming classes, and student activity
           </p>
         </div>
-        <Button
-          asChild
-          className="bg-[#611f69] text-white hover:bg-[#4a174f] dark:bg-[#c084fc] dark:text-black dark:hover:bg-[#d8b4fe]"
-        >
+        <Button asChild className="bg-[#611f69] text-white hover:bg-[#4a174f] dark:bg-[#c084fc] dark:text-black">
           <Link href="/">Back to Website</Link>
         </Button>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {stats.map((s, i) => (
-          <StatCard key={s.label} {...s} index={i} />
-        ))}
-      </div>
-
-      <div className="mb-8">
-        <RecentNotifications />
-      </div>
-
-      {/* Upcoming sessions */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-5 shadow-sm">
-        <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-          <Clock className="w-4 h-4 text-[#611f69] dark:text-[#c084fc]" />
-          Upcoming Sessions
-        </h2>
-        {loading ? (
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-14 bg-gray-100 dark:bg-gray-700 rounded-lg animate-pulse" />
-            ))}
+      {loading ? (
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {[1, 2, 3, 4].map((item) => (
+            <div key={item} className="h-32 animate-pulse rounded-xl bg-white dark:bg-gray-800" />
+          ))}
+        </div>
+      ) : (
+        <>
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <StatCard
+              icon={<Wallet className="h-5 w-5" />}
+              label="Monthly Earnings"
+              value={money(analytics.monthlyEarnings)}
+              helper="Paid sessions this month"
+            />
+            <StatCard
+              icon={<CheckCircle2 className="h-5 w-5" />}
+              label="Completed Sessions"
+              value={analytics.completedSessions}
+              helper="Marked completed by tutor"
+            />
+            <StatCard
+              icon={<Clock className="h-5 w-5" />}
+              label="Upcoming Sessions"
+              value={analytics.upcomingSessions}
+              helper="Confirmed future bookings"
+            />
+            <StatCard
+              icon={<Users className="h-5 w-5" />}
+              label="Students"
+              value={analytics.uniqueStudents}
+              helper="Unique learners booked"
+            />
           </div>
-        ) : upcoming.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-8">
-            No upcoming sessions. Share your profile to get bookings!
-          </p>
-        ) : (
-          <div className="space-y-3">
-            {upcoming.map((booking) => (
-              <div
-                key={booking.id}
-                className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-700 last:border-0"
-              >
-                <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {booking.student?.name || "Student"}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {new Date(booking.dateTime).toLocaleDateString()} • {new Date(booking.dateTime).toLocaleTimeString("en-BD", { hour: "2-digit", minute: "2-digit" })}
-                  </p>
-                </div>
-                <Badge variant="warning">CONFIRMED</Badge>
+
+          <div className="mt-6 grid min-w-0 gap-6 xl:grid-cols-2">
+            <Card className="min-w-0 rounded-xl border border-gray-100 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+              <h2 className="mb-4 text-sm font-semibold text-gray-900 dark:text-white">
+                Earnings Trend
+              </h2>
+              <div className="h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={analytics.earningsChart}>
+                    <defs>
+                      <linearGradient id="tutorEarnings" x1="0" x2="0" y1="0" y2="1">
+                        <stop offset="5%" stopColor="#0f766e" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#0f766e" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip formatter={(value) => money(Number(value))} />
+                    <Area type="monotone" dataKey="earnings" stroke="#0f766e" fill="url(#tutorEarnings)" strokeWidth={2} />
+                  </AreaChart>
+                </ResponsiveContainer>
               </div>
-            ))}
+            </Card>
+
+            <Card className="min-w-0 rounded-xl border border-gray-100 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+              <h2 className="mb-4 text-sm font-semibold text-gray-900 dark:text-white">
+                Session Status
+              </h2>
+              <div className="h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={analytics.sessionChart}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="status" />
+                    <YAxis allowDecimals={false} />
+                    <Tooltip />
+                    <Bar dataKey="count" fill="#611f69" radius={[6, 6, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </Card>
           </div>
-        )}
-      </div>
+
+          <div className="mt-6 grid min-w-0 gap-6 xl:grid-cols-[1.2fr_1fr]">
+            <Card className="min-w-0 rounded-xl border border-gray-100 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+              <h2 className="mb-4 flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
+                <CalendarDays className="h-4 w-4 text-[#611f69] dark:text-[#c084fc]" />
+                Upcoming Sessions
+              </h2>
+              {analytics.upcoming.length === 0 ? (
+                <p className="py-10 text-center text-sm text-gray-400">
+                  No upcoming sessions yet.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {analytics.upcoming.slice(0, 6).map((booking) => (
+                    <div
+                      key={booking.id}
+                      className="flex flex-col gap-3 rounded-lg border border-gray-100 p-3 dark:border-gray-700 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
+                          {booking.student?.name || "Student"}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {booking.course?.title || "Tutoring Session"}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          {new Date(booking.dateTime).toLocaleDateString("en-BD")} -{" "}
+                          {new Date(booking.dateTime).toLocaleTimeString("en-BD", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                      </div>
+                      <Badge className="self-start sm:self-center" variant="warning">CONFIRMED</Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
+
+            <RecentNotifications />
+          </div>
+        </>
+      )}
     </div>
   );
 }

@@ -143,9 +143,9 @@ export default function AdminMentorsPage() {
   );
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="mx-auto max-w-6xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+        <h1 className="flex items-center gap-3 text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">
           <ShieldCheck className="w-8 h-8 text-[#611f69] dark:text-[#c084fc]" />
           Mentors Management
         </h1>
@@ -156,18 +156,18 @@ export default function AdminMentorsPage() {
       </div>
 
       <Tabs defaultValue="promote" className="space-y-6">
-        <TabsList className="bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
-          <TabsTrigger value="promote" className="rounded-lg px-6">
+        <TabsList className="h-auto w-full flex-wrap justify-start rounded-xl bg-gray-100 p-1 dark:bg-gray-800 sm:w-auto">
+          <TabsTrigger value="promote" className="flex-1 rounded-lg px-3 sm:flex-none sm:px-6">
             Promote Students
           </TabsTrigger>
-          <TabsTrigger value="create" className="rounded-lg px-6">
+          <TabsTrigger value="create" className="flex-1 rounded-lg px-3 sm:flex-none sm:px-6">
             Create Fresh Mentor
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="promote" className="space-y-4">
           <div className="flex items-center justify-between gap-4">
-            <div className="relative flex-1 max-w-md">
+            <div className="relative w-full max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
                 placeholder="Search students to promote..."
@@ -198,9 +198,9 @@ export default function AdminMentorsPage() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: i * 0.05 }}
-                    className="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                    className="flex flex-col gap-4 p-4 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50 sm:flex-row sm:items-center sm:justify-between"
                   >
-                    <div className="flex items-center gap-4">
+                    <div className="flex min-w-0 items-center gap-4">
                       <div className="w-12 h-12 rounded-full overflow-hidden shrink-0">
                         <Image
                           src={getAvatarUrl(user.image)}
@@ -210,11 +210,11 @@ export default function AdminMentorsPage() {
                           className="object-cover w-full h-full"
                         />
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <h3 className="font-semibold text-gray-900 dark:text-white">
                           {user.name}
                         </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <p className="truncate text-sm text-gray-500 dark:text-gray-400">
                           {user.email}
                         </p>
                       </div>
@@ -225,7 +225,7 @@ export default function AdminMentorsPage() {
                         setShowPromoteDialog(true);
                       }}
                       variant="outline"
-                      className="border-[#611f69] text-[#611f69] dark:border-[#c084fc] dark:text-[#c084fc] hover:bg-[#611f69] hover:text-white rounded-lg"
+                      className="w-full rounded-lg border-[#611f69] text-[#611f69] hover:bg-[#611f69] hover:text-white dark:border-[#c084fc] dark:text-[#c084fc] sm:w-auto"
                     >
                       <UserPlus className="w-4 h-4 mr-2" /> Make Mentor
                     </Button>
@@ -237,7 +237,7 @@ export default function AdminMentorsPage() {
         </TabsContent>
 
         <TabsContent value="create">
-          <div className="max-w-2xl bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-8 shadow-sm">
+          <div className="max-w-2xl rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 sm:p-8">
             <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
               <Plus className="w-5 h-5 text-[#611f69] dark:text-[#c084fc]" />{" "}
               New Mentor Account
@@ -413,7 +413,7 @@ export default function AdminMentorsPage() {
         open={!!generatedPassword}
         onOpenChange={() => setGeneratedPassword(null)}
       >
-        <DialogContent className="text-center p-8 rounded-3xl">
+          <DialogContent className="rounded-3xl p-5 text-center sm:p-8">
           <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
             <Check className="w-10 h-10 text-green-600 dark:text-green-400" />
           </div>
@@ -429,7 +429,7 @@ export default function AdminMentorsPage() {
             <p className="text-[10px] text-gray-400 mb-2 uppercase tracking-[0.2em] font-black">
               Temporary Password
             </p>
-            <p className="text-4xl font-mono font-bold text-[#611f69] dark:text-[#c084fc] tracking-tight">
+            <p className="break-all font-mono text-2xl font-bold tracking-tight text-[#611f69] dark:text-[#c084fc] sm:text-4xl">
               {generatedPassword}
             </p>
           </div>

@@ -25,6 +25,7 @@ import { ModeToggle } from "./ModeToggle";
 import { useLogout } from "@/lib/logout";
 import { getAvatarUrl } from "@/lib/avatar";
 import NotificationBell from "@/components/notifications/NotificationBell";
+import GlobalSearch from "@/components/search/GlobalSearch";
 
 interface MenuItem {
   title: string;
@@ -112,6 +113,9 @@ export function Navbar({ className }: NavbarProps) {
 
           {/* Actions */}
           <div className="flex items-center gap-3">
+            <div className="hidden w-72 xl:block">
+              <GlobalSearch />
+            </div>
             {!loading && user ? (
               <>
                 <NotificationBell />
@@ -209,6 +213,10 @@ export function Navbar({ className }: NavbarProps) {
                 </SheetHeader>
 
                 <div className="mt-6 flex flex-col gap-6">
+                  <div className="px-4">
+                    <GlobalSearch />
+                  </div>
+
                   <Accordion type="single" collapsible className="space-y-3">
                     {menu.map((item) => (
                       <Link

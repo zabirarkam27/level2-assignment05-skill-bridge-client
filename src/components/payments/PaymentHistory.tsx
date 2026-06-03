@@ -31,6 +31,14 @@ function formatAmount(payment: PaymentHistoryItem) {
   return `${payment.currency.toUpperCase()} ${payment.amount}`;
 }
 
+const htmlEscape = (value: string) =>
+  value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
 function getCounterparty(payment: PaymentHistoryItem, role: PaymentHistoryProps["role"]) {
   if (role === "student") return payment.tutor?.user?.name ?? "Tutor";
   if (role === "tutor") return payment.student?.name ?? "Student";
@@ -98,6 +106,21 @@ export default function PaymentHistory({ role }: PaymentHistoryProps) {
     const sessionDate = payment.booking?.dateTime
       ? new Date(payment.booking.dateTime).toLocaleString("en-BD")
       : payment.createdAt;
+    const safeInvoice = {
+      invoiceId: htmlEscape(invoiceId),
+      status: htmlEscape(payment.status),
+      transactionId: htmlEscape(payment.transactionId),
+      gateway: htmlEscape(payment.gateway),
+      invoiceDate: htmlEscape(new Date(payment.createdAt).toLocaleString("en-BD")),
+      studentName: htmlEscape(payment.student?.name ?? "N/A"),
+      studentEmail: htmlEscape(payment.student?.email ?? "N/A"),
+      tutorName: htmlEscape(payment.tutor?.user?.name ?? "N/A"),
+      sessionDate: htmlEscape(sessionDate),
+      course: htmlEscape(payment.course?.title ?? "N/A"),
+      category: htmlEscape(payment.course?.category?.name ?? "N/A"),
+      bookingStatus: htmlEscape(payment.booking?.status ?? "Not created yet"),
+      amount: htmlEscape(formatAmount(payment)),
+    };
 
     return `
       <html>
@@ -140,36 +163,36 @@ export default function PaymentHistory({ role }: PaymentHistoryProps) {
                   <h1>SkillBridge Invoice</h1>
                   <p>Thank you for learning with SkillBridge.</p>
                 </div>
-                <div class="badge">${payment.status}</div>
+                <div class="badge">${safeInvoice.status}</div>
               </div>
               <div class="meta">
-                <div><p class="label">Invoice ID</p><p class="value">${invoiceId}</p></div>
-                <div><p class="label">Transaction ID</p><p class="value">${payment.transactionId}</p></div>
-                <div><p class="label">Gateway</p><p class="value">${payment.gateway}</p></div>
-                <div><p class="label">Invoice Date</p><p class="value">${new Date(payment.createdAt).toLocaleString("en-BD")}</p></div>
+                <div><p class="label">Invoice ID</p><p class="value">${safeInvoice.invoiceId}</p></div>
+                <div><p class="label">Transaction ID</p><p class="value">${safeInvoice.transactionId}</p></div>
+                <div><p class="label">Gateway</p><p class="value">${safeInvoice.gateway}</p></div>
+                <div><p class="label">Invoice Date</p><p class="value">${safeInvoice.invoiceDate}</p></div>
               </div>
               <div class="content">
                 <div class="grid">
                   <section class="box">
                     <h2>STUDENT DETAILS</h2>
-                    <p class="label">Name</p><p class="value">${payment.student?.name ?? "N/A"}</p>
-                    <p class="label">Email</p><p class="value">${payment.student?.email ?? "N/A"}</p>
+                    <p class="label">Name</p><p class="value">${safeInvoice.studentName}</p>
+                    <p class="label">Email</p><p class="value">${safeInvoice.studentEmail}</p>
                   </section>
                   <section class="box">
                     <h2>SESSION DETAILS</h2>
-                    <p class="label">Tutor</p><p class="value">${payment.tutor?.user?.name ?? "N/A"}</p>
-                    <p class="label">Session Date</p><p class="value">${sessionDate}</p>
+                    <p class="label">Tutor</p><p class="value">${safeInvoice.tutorName}</p>
+                    <p class="label">Session Date</p><p class="value">${safeInvoice.sessionDate}</p>
                   </section>
                 </div>
                 <section class="summary">
                   <h2>Course Summary</h2>
-                  <div class="row"><span>Course</span><span>${payment.course?.title ?? "N/A"}</span></div>
-                  <div class="row"><span>Category</span><span>${payment.course?.category?.name ?? "N/A"}</span></div>
-                  <div class="row"><span>Booking Status</span><span>${payment.booking?.status ?? "Not created yet"}</span></div>
+                  <div class="row"><span>Course</span><span>${safeInvoice.course}</span></div>
+                  <div class="row"><span>Category</span><span>${safeInvoice.category}</span></div>
+                  <div class="row"><span>Booking Status</span><span>${safeInvoice.bookingStatus}</span></div>
                 </section>
                 <div class="total">
-                  <div><p>Total Paid</p><p class="amount">${formatAmount(payment)}</p></div>
-                  <div class="paid"><p>Payment</p><strong>${payment.status}</strong></div>
+                  <div><p>Total Paid</p><p class="amount">${safeInvoice.amount}</p></div>
+                  <div class="paid"><p>Payment</p><strong>${safeInvoice.status}</strong></div>
                 </div>
                 <p class="footer">This invoice confirms your SkillBridge booking and payment record.</p>
               </div>
@@ -281,12 +304,12 @@ export default function PaymentHistory({ role }: PaymentHistoryProps) {
               <DialogHeader className="sr-only">
                 <DialogTitle>SkillBridge Invoice</DialogTitle>
               </DialogHeader>
-              <div className="bg-slate-100 px-4 py-8">
+              <div className="bg-slate-100 px-3 py-5 sm:px-4 sm:py-8">
                 <div className="mx-auto max-w-3xl overflow-hidden rounded-3xl bg-white shadow-2xl">
-                  <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-700 px-8 py-8 text-white">
+                  <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-700 px-5 py-6 text-white sm:px-8 sm:py-8">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                       <div>
-                        <h1 className="text-3xl font-bold tracking-tight">
+                        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
                           SkillBridge Invoice
                         </h1>
                         <p className="mt-1 text-sm text-indigo-100">
@@ -299,14 +322,14 @@ export default function PaymentHistory({ role }: PaymentHistoryProps) {
                     </div>
                   </div>
 
-                  <div className="grid gap-4 border-b border-slate-200 px-8 py-6 sm:grid-cols-2">
+                  <div className="grid gap-4 border-b border-slate-200 px-5 py-5 sm:grid-cols-2 sm:px-8 sm:py-6">
                     <InvoiceInfo label="Invoice ID" value={`INV-${selectedInvoice.id.slice(0, 8).toUpperCase()}`} />
                     <InvoiceInfo label="Transaction ID" value={selectedInvoice.transactionId} />
                     <InvoiceInfo label="Gateway" value={selectedInvoice.gateway} />
                     <InvoiceInfo label="Invoice Date" value={new Date(selectedInvoice.createdAt).toLocaleString("en-BD")} />
                   </div>
 
-                  <div className="px-8 py-8">
+                  <div className="px-5 py-6 sm:px-8 sm:py-8">
                     <div className="grid gap-6 md:grid-cols-2">
                       <section className="rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200">
                         <h2 className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-500">
@@ -342,11 +365,11 @@ export default function PaymentHistory({ role }: PaymentHistoryProps) {
                       </div>
                     </section>
 
-                    <div className="mt-8 rounded-3xl bg-slate-950 p-6 text-white">
-                      <div className="flex items-center justify-between gap-4">
+                    <div className="mt-8 rounded-3xl bg-slate-950 p-5 text-white sm:p-6">
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                           <p className="text-sm text-slate-400">Total Paid</p>
-                          <p className="mt-1 text-4xl font-extrabold">
+                          <p className="mt-1 break-words text-3xl font-extrabold sm:text-4xl">
                             {formatAmount(selectedInvoice)}
                           </p>
                         </div>

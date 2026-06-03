@@ -9,6 +9,7 @@ import { Menu, Clock, XCircle, ShieldAlert } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useLogout } from "@/lib/logout";
+import GlobalSearch from "@/components/search/GlobalSearch";
 
 function PendingScreen() {
   const { refetch } = useSessionContext();
@@ -179,7 +180,13 @@ export default function DashboardLayout({
           </span>
         </div>
 
-        <main className="flex-1 p-6">{children}</main>
+        <div className="border-b border-gray-200 bg-white px-4 py-4 dark:border-gray-800 dark:bg-gray-950 sm:px-6">
+          <GlobalSearch />
+        </div>
+
+        <main className="min-w-0 flex-1 overflow-x-hidden p-4 sm:p-6">
+          {children}
+        </main>
       </div>
     </div>
   );

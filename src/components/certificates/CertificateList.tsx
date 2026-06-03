@@ -92,16 +92,16 @@ function CertificatePreview({ certificate }: { certificate: Certificate }) {
     certificate.course?.tutor?.name ?? "SkillBridge Instructor";
 
   return (
-    <div className="bg-slate-100 px-4 py-8 print:bg-white">
+    <div className="bg-slate-100 px-3 py-5 print:bg-white sm:px-4 sm:py-8">
       <div
         id="certificate-preview"
-        className="mx-auto aspect-[1.414/1] max-w-5xl overflow-hidden border-[10px] border-[#c39a35] bg-[#fffaf0] p-4 shadow-2xl print:shadow-none"
+        className="mx-auto aspect-[1.414/1] max-w-5xl overflow-hidden border-[6px] border-[#c39a35] bg-[#fffaf0] p-2 shadow-2xl print:shadow-none sm:border-[10px] sm:p-4"
       >
-        <div className="flex h-full flex-col border border-[#e3c36f] px-8 py-7 text-center">
+        <div className="flex h-full flex-col border border-[#e3c36f] px-3 py-3 text-center sm:px-8 sm:py-7">
           <div className="flex items-start justify-between gap-4">
             <div className="text-left">
-              <p className="text-2xl font-bold text-[#611f69]">SkillBridge</p>
-              <p className="mt-1 text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">
+              <p className="text-base font-bold text-[#611f69] sm:text-2xl">SkillBridge</p>
+              <p className="mt-1 text-[8px] font-semibold uppercase tracking-[0.16em] text-amber-700 sm:text-xs sm:tracking-[0.24em]">
                 Official Certification
               </p>
             </div>
@@ -114,25 +114,25 @@ function CertificatePreview({ certificate }: { certificate: Certificate }) {
           </div>
 
           <div className="flex flex-1 flex-col justify-center">
-            <p className="text-sm font-semibold uppercase tracking-[0.32em] text-slate-500">
+            <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-slate-500 sm:text-sm sm:tracking-[0.32em]">
               Certificate of Completion
             </p>
-            <h2 className="mt-6 text-4xl font-bold text-slate-950">
+            <h2 className="mt-3 break-words text-xl font-bold text-slate-950 sm:mt-6 sm:text-4xl">
               {studentName}
             </h2>
-            <div className="mx-auto mt-4 h-px w-72 bg-[#c39a35]" />
-            <p className="mt-8 text-sm text-slate-500">
+            <div className="mx-auto mt-2 h-px w-32 bg-[#c39a35] sm:mt-4 sm:w-72" />
+            <p className="mt-3 text-[10px] text-slate-500 sm:mt-8 sm:text-sm">
               For successfully completing
             </p>
-            <h3 className="mx-auto mt-3 max-w-3xl text-3xl font-bold text-slate-950">
+            <h3 className="mx-auto mt-2 max-w-3xl break-words text-base font-bold text-slate-950 sm:mt-3 sm:text-3xl">
               {courseTitle}
             </h3>
-            <p className="mt-3 text-sm font-semibold text-amber-700">
+            <p className="mt-2 text-[10px] font-semibold text-amber-700 sm:mt-3 sm:text-sm">
               {category}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 text-left text-sm sm:grid-cols-3">
+          <div className="grid grid-cols-3 gap-2 text-left text-[9px] sm:gap-4 sm:text-sm">
             <div>
               <p className="text-xs font-bold uppercase text-slate-400">
                 Issued Date
@@ -457,6 +457,7 @@ export default function CertificateList({ mode }: CertificateListProps) {
                   <Link
                     href={getVerificationHref(selectedCertificate)}
                     target="_blank"
+                    rel="noreferrer"
                   >
                     <ExternalLink className="mr-2 h-4 w-4" />
                     Verify Page

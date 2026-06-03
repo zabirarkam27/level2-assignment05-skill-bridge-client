@@ -100,7 +100,7 @@ function BookingCard({
       transition={{ duration: 0.4, delay: index * 0.07 }}
       className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-5 shadow-sm hover:shadow-md transition-shadow"
     >
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex-1">
           <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
             {booking.tutor?.user.name || "Tutor"}
@@ -131,7 +131,7 @@ function BookingCard({
             </span>
           </div>
         </div>
-        <div className="flex flex-col items-end gap-2">
+        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:flex-col sm:items-end">
           <Badge variant={statusVariant[booking.status]} className="flex items-center gap-1">
             {statusIcon[booking.status]}
             {booking.status}

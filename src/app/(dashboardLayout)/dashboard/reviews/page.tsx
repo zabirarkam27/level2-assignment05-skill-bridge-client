@@ -169,7 +169,7 @@ export default function StudentReviewsPage() {
 
   return (
     <div className="max-w-2xl">
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <MessageSquare className="w-6 h-6 text-[#611f69] dark:text-[#c084fc]" />
