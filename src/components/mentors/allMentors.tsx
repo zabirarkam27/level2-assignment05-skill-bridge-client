@@ -17,17 +17,21 @@ import WishlistToggle from "@/components/wishlist/WishlistToggle";
 interface MentorCardProps {
   tutor: Mentor;
   index: number;
+  subjectLimit?: number;
 }
 
-export function MentorCard({ tutor, index }: MentorCardProps) {
+export function MentorCard({ tutor, index, subjectLimit = 3 }: MentorCardProps) {
   const rating = tutor.rating ?? 0;
+  const visibleSubjects = tutor.subjects.slice(0, subjectLimit);
+  const hiddenSubjectCount = Math.max(tutor.subjects.length - subjectLimit, 0);
+
   return (
-    <Link href={`/mentors/${tutor.id}`} className="block group">
+    <Link href={`/mentors/${tutor.id}`} className="group block h-full">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: index * 0.08 }}
-        className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700"
+        className="relative flex h-[420px] flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-md transition-all duration-300 hover:shadow-2xl dark:border-gray-700 dark:bg-gray-800"
       >
         {/* top accent bar */}
         <div className="h-1 w-full bg-gradient-to-r from-[#7b2a85] via-[#611f69] to-[#a855f7]" />
@@ -38,7 +42,7 @@ export function MentorCard({ tutor, index }: MentorCardProps) {
           className="absolute right-3 top-4 z-10"
         />
 
-        <div className="p-6 flex flex-col items-center text-center">
+        <div className="flex grow flex-col items-center p-6 text-center">
           {/* Avatar */}
           <div className="relative mb-4">
             <div className="w-24 h-24 rounded-full ring-4 ring-[#611f69]/30 group-hover:ring-[#611f69] transition-all duration-300 overflow-hidden">
@@ -54,13 +58,13 @@ export function MentorCard({ tutor, index }: MentorCardProps) {
           </div>
 
           {/* Name */}
-          <h3 className="text-lg font-bold text-gray-900 dark:text-white leading-tight">
+          <h3 className="line-clamp-2 min-h-[3rem] text-lg font-bold leading-6 text-gray-900 dark:text-white">
             {tutor.user.name}
           </h3>
 
           {/* Subjects */}
-          <div className="flex flex-wrap justify-center gap-1 mt-2">
-            {tutor.subjects.slice(0, 3).map((subject) => (
+          <div className="mt-2 flex h-[3.75rem] flex-wrap content-start justify-center gap-1 overflow-hidden">
+            {visibleSubjects.map((subject) => (
               <span
                 key={subject}
                 className="text-xs px-2 py-0.5 rounded-full bg-[#611f69]/10 text-[#611f69] dark:bg-[#c084fc]/20 dark:text-[#e9d5ff] font-medium"
@@ -68,15 +72,15 @@ export function MentorCard({ tutor, index }: MentorCardProps) {
                 {subject}
               </span>
             ))}
-            {tutor.subjects.length > 3 && (
+            {hiddenSubjectCount > 0 && (
               <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400">
-                +{tutor.subjects.length - 3} more
+                +{hiddenSubjectCount} more
               </span>
             )}
           </div>
 
           {/* Bio */}
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-3 line-clamp-2 leading-relaxed">
+          <p className="mt-3 line-clamp-2 h-[2.75rem] text-sm leading-relaxed text-gray-500 dark:text-gray-400">
             {tutor.bio || "Passionate educator helping students excel."}
           </p>
 
@@ -93,7 +97,7 @@ export function MentorCard({ tutor, index }: MentorCardProps) {
           </div>
 
           {/* Price + CTA */}
-          <div className="mt-5 w-full flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
+          <div className="mt-auto flex w-full items-center justify-between border-t border-gray-100 pt-4 dark:border-gray-700">
             <div>
               <p className="text-xs text-gray-400 dark:text-gray-500">Rate</p>
               <p className="text-base font-bold text-[#611f69] dark:text-[#c084fc]">
@@ -115,7 +119,7 @@ export function MentorCard({ tutor, index }: MentorCardProps) {
 
 function MentorSkeleton() {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 overflow-hidden animate-pulse">
+    <div className="h-[420px] overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-md dark:border-gray-700 dark:bg-gray-800 animate-pulse">
       <div className="h-1 w-full bg-gray-200 dark:bg-gray-700" />
       <div className="p-6 flex flex-col items-center">
         <div className="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700 mb-4" />
@@ -150,6 +154,7 @@ export default function AllMentors({ limit }: AllMentorsProps) {
 
   const displayMentors = limit ? mentors.slice(0, limit) : mentors;
   const showFilterUI = !limit;
+  const subjectLimit = limit ? 2 : 3;
 
   const fetchMentors = useCallback(
     async (params?: {
@@ -334,7 +339,7 @@ export default function AllMentors({ limit }: AllMentorsProps) {
 
         {/* Loading skeletons */}
         {loading && (
-          <div className="mt-10 py-6 grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid auto-rows-fr items-stretch gap-6 py-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: limit || 6 }).map((_, i) => (
               <MentorSkeleton key={i} />
             ))}
@@ -357,9 +362,14 @@ export default function AllMentors({ limit }: AllMentorsProps) {
 
         {/* Grid */}
         {!loading && !error && displayMentors.length > 0 && (
-          <div className="mt-10 py-6 grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid auto-rows-fr items-stretch gap-6 py-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {displayMentors.map((tutor, i) => (
-              <MentorCard key={tutor.id} tutor={tutor} index={i} />
+              <MentorCard
+                key={tutor.id}
+                tutor={tutor}
+                index={i}
+                subjectLimit={subjectLimit}
+              />
             ))}
           </div>
         )}

@@ -473,7 +473,7 @@ export default function CourseManager({ mode }: CourseManagerProps) {
       )}
 
       {loading ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid auto-rows-fr grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
@@ -491,14 +491,14 @@ export default function CourseManager({ mode }: CourseManagerProps) {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid auto-rows-fr grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {visibleCourses.map((course, i) => (
             <motion.div
               key={course.id}
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800"
+              className="flex h-full min-h-[355px] flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800"
             >
               <div className="relative h-36 w-full">
                 <Image
@@ -514,14 +514,14 @@ export default function CourseManager({ mode }: CourseManagerProps) {
                   </Badge>
                 )}
               </div>
-              <div className="p-4">
+              <div className="flex grow flex-col p-4">
                 <Badge variant="outline" className="mb-2 text-xs">
                   {course.category.name}
                 </Badge>
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                <h3 className="line-clamp-2 min-h-10 text-sm font-semibold leading-5 text-gray-900 dark:text-white">
                   {course.title}
                 </h3>
-                <p className="mt-1 line-clamp-2 text-xs text-gray-500">
+                <p className="mt-1 line-clamp-2 min-h-8 text-xs text-gray-500">
                   {course.description || "No description"}
                 </p>
                 {!isAdmin && (
@@ -540,7 +540,7 @@ export default function CourseManager({ mode }: CourseManagerProps) {
                     Instructor: {course.tutor?.name || "Not assigned"}
                   </p>
                 )}
-                <div className="mt-3 flex flex-wrap items-center gap-1">
+                <div className="mt-auto flex flex-wrap items-center gap-1 pt-3">
                   {isAdmin && (
                     <button
                       type="button"

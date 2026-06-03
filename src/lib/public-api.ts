@@ -1,4 +1,4 @@
-const LIVE_API_URL = "https://skill-bridge-server-tan.vercel.app";
+const LIVE_API_URL = "https://skil-bridge-server-v2.vercel.app";
 const CLIENT_CACHE_TTL = 45 * 1000;
 
 type CachedResponse = {

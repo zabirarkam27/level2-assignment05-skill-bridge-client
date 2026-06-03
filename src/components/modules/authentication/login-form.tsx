@@ -26,11 +26,30 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useSessionContext } from "@/context/SessionContext";
 import { Eye, EyeOff } from "lucide-react";
+import { UserRole } from "@/types/routes.type";
 
 const formSchema = z.object({
   email: z.email(),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
+
+function getDashboardPath(role?: UserRole) {
+  if (role === "ADMIN") return "/admin";
+  if (role === "TUTOR") return "/tutor/dashboard";
+  return "/";
+}
+
+async function getLoggedInUserRole() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/get-session`, {
+    credentials: "include",
+    cache: "no-store",
+  });
+
+  if (!res.ok) return undefined;
+
+  const data = await res.json();
+  return data?.user?.role as UserRole | undefined;
+}
 
 export function LoginForm({
   className,
@@ -54,7 +73,7 @@ export function LoginForm({
         const { error } = await authClient.signIn.email({
           email: value.email,
           password: value.password,
-          callbackURL: `${process.env.NEXT_PUBLIC_APP_URL}`,
+          callbackURL: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
         });
         if (error) {
           toast.error(error.message, { id: toastId });
@@ -62,8 +81,9 @@ export function LoginForm({
         }
 
         await refetch();
+        const role = await getLoggedInUserRole();
         toast.success("Logged  in successfully", { id: toastId });
-        router.replace("/dashboard");
+        router.replace(getDashboardPath(role));
         router.refresh();
       } catch {
         toast.error("Something went wrong", { id: toastId });

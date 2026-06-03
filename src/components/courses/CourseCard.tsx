@@ -29,7 +29,7 @@ export function CourseCard({ course, index = 0 }: CourseCardProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 12 }}
       transition={{ duration: 0.35, delay: index * 0.04 }}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg transition-shadow hover:shadow-xl dark:border-gray-700 dark:bg-gray-800"
+      className="group relative flex h-full min-h-[430px] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg transition-shadow hover:shadow-xl dark:border-gray-700 dark:bg-gray-800"
     >
       <Link href={`/courses/${course.id}`} className="flex grow flex-col">
         <div className="relative h-48 w-full overflow-hidden">
@@ -59,10 +59,10 @@ export function CourseCard({ course, index = 0 }: CourseCardProps) {
           <span className="mb-2 inline-block w-fit rounded-full bg-[#611f69]/10 px-2.5 py-0.5 text-xs font-medium text-[#611f69] dark:bg-[#c084fc]/20 dark:text-[#c084fc]">
             {course.category.name}
           </span>
-          <h3 className="text-xl font-semibold text-gray-800 transition-colors group-hover:text-[#611f69] dark:text-white dark:group-hover:text-[#c084fc]">
+          <h3 className="line-clamp-2 min-h-[3.5rem] text-xl font-semibold leading-7 text-gray-800 transition-colors group-hover:text-[#611f69] dark:text-white dark:group-hover:text-[#c084fc]">
             {course.title}
           </h3>
-          <p className="mt-2 line-clamp-3 text-sm text-gray-600 dark:text-gray-300">
+          <p className="mt-2 line-clamp-3 min-h-[3.75rem] text-sm leading-5 text-gray-600 dark:text-gray-300">
             {course.description || "No description available"}
           </p>
           <div className="mt-auto flex items-center justify-between gap-3 pt-5">

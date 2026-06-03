@@ -49,7 +49,7 @@ export default function HowItWorks() {
           </p>
         </div>
 
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-10 grid auto-rows-fr items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((step, index) => {
             const Icon = step.icon;
 
@@ -60,15 +60,15 @@ export default function HowItWorks() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.45, delay: index * 0.08 }}
                 viewport={{ once: true }}
-                className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-colors dark:border-gray-800 dark:bg-gray-900"
+                className="flex h-full min-h-64 flex-col rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-colors dark:border-gray-800 dark:bg-gray-900"
               >
                 <div className="flex h-11 w-11 items-center justify-center rounded-md bg-[#611f69]/10 text-[#611f69] dark:bg-[#c084fc]/15 dark:text-[#e9d5ff]">
                   <Icon className="h-5 w-5" />
                 </div>
-                <h3 className="mt-5 text-lg font-semibold text-gray-900 dark:text-white">
+                <h3 className="mt-5 line-clamp-2 min-h-14 text-lg font-semibold leading-7 text-gray-900 dark:text-white">
                   {step.title}
                 </h3>
-                <p className="mt-3 text-sm leading-6 text-gray-600 dark:text-gray-300">
+                <p className="mt-3 line-clamp-4 text-sm leading-6 text-gray-600 dark:text-gray-300">
                   {step.description}
                 </p>
               </motion.div>

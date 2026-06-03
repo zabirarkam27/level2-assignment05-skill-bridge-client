@@ -4,9 +4,9 @@ Frontend for the Assignment 5 SkillBridge full-stack project.
 
 ## Live Links
 
-- Frontend: `https://skill-bridge-client-two-beta.vercel.app/`
-- Backend: `https://skill-bridge-server-tan.vercel.app/`
-- Video walkthrough: `https://drive.google.com/file/d/1eSWTzs7AbmhB9P2nNIkrv_M_C003kcoB/view`
+- Frontend: `https://skil-bridge-client-v2.vercel.app/`
+- Backend: `https://skil-bridge-server-v2.vercel.app/`
+- Video walkthrough: ``
 
 ## Admin Credentials
 

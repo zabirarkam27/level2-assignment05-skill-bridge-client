@@ -89,7 +89,7 @@ export default function WishlistPage() {
       </div>
 
       {loading ? (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid auto-rows-fr gap-4 md:grid-cols-2">
           {[1, 2, 3, 4].map((item) => (
             <div
               key={item}
@@ -127,13 +127,13 @@ export default function WishlistPage() {
                 No saved courses.
               </p>
             ) : (
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid auto-rows-fr items-stretch gap-4 md:grid-cols-2">
                 {wishlist.courses.map((course) => (
                   <div
                     key={course.id}
-                    className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800"
+                    className="h-full min-h-36 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800"
                   >
-                    <div className="flex gap-4 p-4">
+                    <div className="flex h-full gap-4 p-4">
                       <div className="relative h-24 w-28 shrink-0 overflow-hidden rounded-lg">
                         <Image
                           src={course.image || COURSE_PLACEHOLDER_IMAGE}
@@ -142,20 +142,20 @@ export default function WishlistPage() {
                           className="object-cover"
                         />
                       </div>
-                      <div className="min-w-0 flex-1">
+                      <div className="flex min-w-0 flex-1 flex-col">
                         <p className="text-xs font-medium text-[#611f69] dark:text-[#c084fc]">
                           {course.category?.name}
                         </p>
                         <Link
                           href={`/courses/${course.id}`}
-                          className="mt-1 block truncate font-semibold text-gray-900 hover:text-[#611f69] dark:text-white dark:hover:text-[#c084fc]"
+                          className="mt-1 line-clamp-2 min-h-12 font-semibold text-gray-900 hover:text-[#611f69] dark:text-white dark:hover:text-[#c084fc]"
                         >
                           {course.title}
                         </Link>
-                        <p className="mt-1 line-clamp-2 text-xs text-gray-500 dark:text-gray-400">
+                        <p className="mt-1 line-clamp-2 min-h-8 text-xs text-gray-500 dark:text-gray-400">
                           {course.description || "No description available"}
                         </p>
-                        <p className="mt-2 text-[11px] text-gray-400">
+                        <p className="mt-auto pt-2 text-[11px] text-gray-400">
                           {course._count?.wishlists ?? 0} students saved this course
                         </p>
                       </div>
@@ -185,13 +185,13 @@ export default function WishlistPage() {
                 No saved tutors.
               </p>
             ) : (
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid auto-rows-fr items-stretch gap-4 md:grid-cols-2">
                 {wishlist.tutors.map((tutor) => (
                   <div
                     key={tutor.id}
-                    className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+                    className="h-full min-h-36 rounded-xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800"
                   >
-                    <div className="flex items-start gap-4">
+                    <div className="flex h-full items-start gap-4">
                       <Image
                         src={getAvatarUrl(tutor.user.image)}
                         alt={tutor.user.name}
@@ -199,17 +199,17 @@ export default function WishlistPage() {
                         height={58}
                         className="rounded-full object-cover"
                       />
-                      <div className="min-w-0 flex-1">
+                      <div className="flex min-w-0 flex-1 flex-col">
                         <Link
                           href={`/mentors/${tutor.id}`}
-                          className="font-semibold text-gray-900 hover:text-[#611f69] dark:text-white dark:hover:text-[#c084fc]"
+                          className="line-clamp-2 min-h-12 font-semibold text-gray-900 hover:text-[#611f69] dark:text-white dark:hover:text-[#c084fc]"
                         >
                           {tutor.user.name}
                         </Link>
-                        <p className="mt-1 line-clamp-1 text-xs text-gray-500 dark:text-gray-400">
+                        <p className="mt-1 line-clamp-1 min-h-4 text-xs text-gray-500 dark:text-gray-400">
                           {tutor.subjects.slice(0, 3).join(", ")}
                         </p>
-                        <div className="mt-2 flex flex-wrap gap-3 text-xs text-gray-400">
+                        <div className="mt-auto flex flex-wrap gap-3 pt-2 text-xs text-gray-400">
                           <span className="flex items-center gap-1">
                             <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
                             {tutor.rating ? tutor.rating.toFixed(1) : "New"}

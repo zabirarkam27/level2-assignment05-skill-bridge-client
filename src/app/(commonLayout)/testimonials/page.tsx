@@ -46,7 +46,7 @@ export default function TestimonialsPage() {
 
       <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         {loading ? (
-          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid auto-rows-fr items-stretch gap-5 md:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3, 4, 5, 6].map((item) => (
               <div
                 key={item}
@@ -59,7 +59,7 @@ export default function TestimonialsPage() {
             No reviews have been published yet.
           </div>
         ) : (
-          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid auto-rows-fr items-stretch gap-5 md:grid-cols-2 lg:grid-cols-3">
             {reviews.map((item) => {
               const studentName = item.booking?.student?.name ?? "Student";
               const tutorName = item.booking?.tutor?.user?.name ?? "SkillBridge tutor";
@@ -67,7 +67,7 @@ export default function TestimonialsPage() {
               return (
               <article
                 key={item.id}
-                className="rounded-lg border border-gray-100 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-gray-800 dark:bg-gray-900"
+                className="flex h-full min-h-72 flex-col rounded-lg border border-gray-100 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-gray-800 dark:bg-gray-900"
               >
                 <Quote className="mb-4 h-7 w-7 text-[#611f69] dark:text-[#c084fc]" />
                 <div className="mb-4 flex gap-1">
@@ -78,10 +78,10 @@ export default function TestimonialsPage() {
                     />
                   ))}
                 </div>
-                <p className="text-sm leading-6 text-gray-600 dark:text-gray-300">
+                <p className="line-clamp-5 text-sm leading-6 text-gray-600 dark:text-gray-300">
                   {item.comment}
                 </p>
-                <div className="mt-6 border-t border-gray-100 pt-4 dark:border-gray-800">
+                <div className="mt-auto border-t border-gray-100 pt-4 dark:border-gray-800">
                   <p className="font-semibold text-gray-900 dark:text-white">
                     {studentName}
                   </p>

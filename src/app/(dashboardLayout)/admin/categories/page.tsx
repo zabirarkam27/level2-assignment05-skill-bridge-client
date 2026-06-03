@@ -233,7 +233,7 @@ export default function AdminCategoriesPage() {
 
       {/* Loading */}
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid auto-rows-fr grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3, 4].map((i) => (
             <div
               key={i}
@@ -242,17 +242,17 @@ export default function AdminCategoriesPage() {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid auto-rows-fr grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {categories.map((cat, i) => (
             <motion.div
               key={cat.id}
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.06 }}
-              className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm"
+              className="flex h-full min-h-[210px] flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800"
             >
-              {cat.image && (
-                <div className="relative h-32 w-full">
+              <div className="relative h-32 w-full bg-gray-100 dark:bg-gray-700">
+                {cat.image && (
                   <Image
                     src={cat.image}
                     alt={cat.name}
@@ -260,22 +260,20 @@ export default function AdminCategoriesPage() {
                     className="object-cover"
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
+                )}
 
-                  <div className="absolute inset-0 bg-black/20" />
-                </div>
-              )}
+                {cat.image && <div className="absolute inset-0 bg-black/20" />}
+              </div>
 
-              <div className="p-4 flex items-start justify-between">
-                <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
+              <div className="flex grow items-start justify-between gap-3 p-4">
+                <div className="min-w-0">
+                  <h3 className="line-clamp-2 min-h-10 text-sm font-semibold leading-5 text-gray-900 dark:text-white">
                     {cat.name}
                   </h3>
 
-                  {cat.description && (
-                    <p className="text-xs text-gray-400 mt-1 line-clamp-2">
-                      {cat.description}
-                    </p>
-                  )}
+                  <p className="mt-1 line-clamp-2 min-h-8 text-xs text-gray-400">
+                    {cat.description || "No description"}
+                  </p>
                 </div>
 
                 <div className="flex items-center gap-1">
