@@ -4,8 +4,8 @@ import { BlogPost } from "@/types/routes.type";
 import { getPublicApiBases } from "@/lib/public-api";
 
 export const metadata = {
-  title: "Blog | SkillBridge",
-  description: "SkillBridge learning guides for students and mentors.",
+  title: "Blog | MentorForge",
+  description: "MentorForge learning guides for students and mentors.",
 };
 
 async function getBlogs(): Promise<BlogPost[]> {
@@ -34,7 +34,7 @@ export default async function BlogPage() {
         <div className="mx-auto max-w-5xl text-center">
           <BookOpenText className="mx-auto h-10 w-10 text-[#611f69] dark:text-[#c084fc]" />
           <h1 className="mt-4 text-3xl font-bold text-gray-900 dark:text-white md:text-5xl">
-            SkillBridge Blog
+            MentorForge Blog
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-gray-600 dark:text-gray-300">
             Practical learning notes for students, tutors, and admins using the platform.
@@ -73,7 +73,7 @@ export default async function BlogPage() {
                   {post.excerpt}
                 </p>
                 <p className="mt-4 text-xs text-gray-500">
-                  By {post.author?.name || "SkillBridge"} ·{" "}
+                  By {post.author?.name || "MentorForge"} ·{" "}
                   {new Date(post.createdAt).toLocaleDateString("en-US", {
                     dateStyle: "medium",
                   })}

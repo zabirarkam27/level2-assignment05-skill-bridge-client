@@ -38,7 +38,7 @@ const formSchema = z.object({
 const demoAccounts = [
   {
     label: "Admin demo",
-    email: "admin@skillbridge.com",
+    email: "admin@mentorforge.com",
     password: "admin1234",
   },
 ];

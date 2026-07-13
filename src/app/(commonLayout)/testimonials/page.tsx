@@ -38,7 +38,7 @@ export default function TestimonialsPage() {
             Student Success Stories
           </h1>
           <p className="mx-auto mt-3 max-w-2xl text-gray-600 dark:text-gray-300">
-            See how learners use SkillBridge to connect with expert mentors,
+            See how learners use MentorForge to connect with expert mentors,
             build confidence, and move faster toward their goals.
           </p>
         </div>
@@ -62,7 +62,7 @@ export default function TestimonialsPage() {
           <div className="grid auto-rows-fr items-stretch gap-5 md:grid-cols-2 lg:grid-cols-4">
             {reviews.map((item) => {
               const studentName = item.booking?.student?.name ?? "Student";
-              const tutorName = item.booking?.tutor?.user?.name ?? "SkillBridge tutor";
+              const tutorName = item.booking?.tutor?.user?.name ?? "MentorForge tutor";
 
               return (
               <article

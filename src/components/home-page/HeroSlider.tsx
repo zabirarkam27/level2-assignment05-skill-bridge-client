@@ -23,7 +23,7 @@ const slides = [
     eyebrow: "Payment-first tutor booking platform",
     title: "Learn with the right mentor, at the right time.",
     description:
-      "SkillBridge helps students discover trusted tutors, choose practical courses, pay before confirmation, and keep every session record organized in one dashboard.",
+      "MentorForge helps students discover trusted tutors, choose practical courses, pay before confirmation, and keep every session record organized in one dashboard.",
     primaryLabel: "Find a mentor",
     primaryHref: "/mentors",
     secondaryLabel: "Explore courses",

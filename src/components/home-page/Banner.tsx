@@ -43,7 +43,7 @@ export default function HomeBanner() {
           className="mx-auto mt-6 max-w-2xl text-lg text-gray-600 dark:text-gray-300 transition-colors duration-300"
         >
           Connect with expert tutors, master new skills, and shape your future
-          with Skill Bridge.
+          with MentorForge.
         </motion.p>
 
         {/* Buttons */}

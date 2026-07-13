@@ -1,8 +1,8 @@
 import { CheckCircle2 } from "lucide-react";
 
 export const metadata = {
-  title: "Terms & Conditions | SkillBridge",
-  description: "Terms for students, tutors, and admins using SkillBridge.",
+  title: "Terms & Conditions | MentorForge",
+  description: "Terms for students, tutors, and admins using MentorForge.",
 };
 
 const termsSections = [
@@ -49,7 +49,7 @@ const termsSections = [
   {
     title: "Platform Safety",
     points: [
-      "SkillBridge may restrict access when suspicious, abusive, or unauthorized activity is detected.",
+      "MentorForge may restrict access when suspicious, abusive, or unauthorized activity is detected.",
       "Admins may moderate users, tutor requests, courses, blogs, bookings, and contact messages.",
       "Users should contact support if they notice incorrect records or unexpected dashboard behavior.",
     ],
@@ -62,13 +62,13 @@ export default function TermsPage() {
       <div className="mx-auto max-w-5xl">
         <div className="rounded-3xl border border-gray-200 bg-linear-to-br from-[#611f69]/10 via-white to-white p-6 dark:border-gray-800 dark:from-[#c084fc]/15 dark:via-gray-950 dark:to-gray-950 md:p-10">
           <p className="text-sm font-semibold uppercase tracking-wide text-[#611f69] dark:text-[#c084fc]">
-            SkillBridge policies
+            MentorForge policies
           </p>
           <h1 className="mt-3 text-3xl font-bold tracking-tight md:text-5xl">
             Terms & Conditions
           </h1>
           <p className="mt-4 max-w-3xl leading-8 text-gray-600 dark:text-gray-300">
-            These terms explain the expected use of SkillBridge for students,
+            These terms explain the expected use of MentorForge for students,
             tutors, and admins. They are written for the assignment project and
             should be reviewed by a legal professional before real commercial
             use.

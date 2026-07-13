@@ -95,7 +95,7 @@ export function SignupForm(props: React.ComponentProps<typeof Card>) {
           Create an account
         </CardTitle>
         <CardDescription>
-          Enter your details to get started with SkillBridge
+          Enter your details to get started with MentorForge
         </CardDescription>
       </CardHeader>
 

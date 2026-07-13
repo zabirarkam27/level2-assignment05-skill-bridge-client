@@ -77,8 +77,8 @@ export function Navbar({ className }: NavbarProps) {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <Image
-              src="/logo.png"
-              alt="SkillBridge Logo"
+              src="/mentorforge-icon.svg"
+              alt="MentorForge Logo"
               width={32}
               height={32}
             />
@@ -105,14 +105,14 @@ export function Navbar({ className }: NavbarProps) {
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2">
               <Image
-                src="/logo.png"
-                alt="SkillBridge Logo"
+                src="/mentorforge-icon.svg"
+                alt="MentorForge Logo"
                 width={32}
                 height={32}
-                className="dark:invert"
+               
               />
               <span className="relative rounded-md px-3 py-1 text-lg font-semibold tracking-tighter bg-linear-to-r from-[#7b2a85] via-[#611f69] to-[#4a174f] dark:from-[#d8b4fe] dark:via-[#c084fc] dark:to-[#a855f7] bg-size-[200%_200%] bg-left bg-clip-text text-transparent transition-all duration-500 hover:bg-right hover:bg-clip-padding hover:text-white dark:hover:text-black">
-                SkillBridge
+                MentorForge
               </span>
             </Link>
 
@@ -223,11 +223,11 @@ export function Navbar({ className }: NavbarProps) {
         <div className="flex h-16 items-center justify-between lg:hidden">
           <Link href="/" className="flex items-center gap-2">
             <Image
-              src="/logo.png"
-              alt="SkillBridge Logo"
+              src="/mentorforge-icon.svg"
+              alt="MentorForge Logo"
               width={32}
               height={32}
-              className="dark:invert"
+             
             />
           </Link>
 
@@ -260,13 +260,13 @@ export function Navbar({ className }: NavbarProps) {
                 <SheetHeader>
                   <SheetTitle className="flex items-center gap-2">
                     <Image
-                      src="/logo.png"
-                      alt="SkillBridge Logo"
+                      src="/mentorforge-icon.svg"
+                      alt="MentorForge Logo"
                       width={32}
                       height={32}
                     />
                     <span className="relative rounded-md px-3 py-1 text-lg font-semibold tracking-tighter bg-linear-to-r from-[#7b2a85] via-[#611f69] to-[#4a174f] dark:from-[#d8b4fe] dark:via-[#c084fc] dark:to-[#a855f7] bg-size-[200%_200%] bg-left bg-clip-text text-transparent transition-all duration-500 hover:bg-right hover:bg-clip-padding hover:text-white dark:hover:text-black">
-                      SkillBridge
+                      MentorForge
                     </span>
                   </SheetTitle>
                 </SheetHeader>

@@ -1,14 +1,14 @@
 import { LockKeyhole, ShieldCheck } from "lucide-react";
 
 export const metadata = {
-  title: "Privacy Policy | SkillBridge",
-  description: "How SkillBridge handles account, booking, and payment data.",
+  title: "Privacy Policy | MentorForge",
+  description: "How MentorForge handles account, booking, and payment data.",
 };
 
 const policySections = [
   {
     title: "Information We Collect",
-    body: "SkillBridge may store account details, profile images, email addresses, tutor profiles, course information, availability slots, booking records, payment references, invoice data, certificates, wishlist items, reviews, notifications, blogs, and contact messages.",
+    body: "MentorForge may store account details, profile images, email addresses, tutor profiles, course information, availability slots, booking records, payment references, invoice data, certificates, wishlist items, reviews, notifications, blogs, and contact messages.",
   },
   {
     title: "How We Use Your Information",
@@ -16,11 +16,11 @@ const policySections = [
   },
   {
     title: "Payments and Transaction Records",
-    body: "Payment processing is handled through Stripe. SkillBridge stores transaction IDs, payment status, amount, gateway name, and related booking records so students, tutors, and admins can verify payment history.",
+    body: "Payment processing is handled through Stripe. MentorForge stores transaction IDs, payment status, amount, gateway name, and related booking records so students, tutors, and admins can verify payment history.",
   },
   {
     title: "Calendar and Meeting Data",
-    body: "When calendar integration is configured, SkillBridge may store Google event IDs or meeting links for confirmed sessions. These records are used only to support scheduling, reminders, and joining sessions.",
+    body: "When calendar integration is configured, MentorForge may store Google event IDs or meeting links for confirmed sessions. These records are used only to support scheduling, reminders, and joining sessions.",
   },
   {
     title: "Role-Based Access",
@@ -53,7 +53,7 @@ export default function PrivacyPage() {
               Privacy Policy
             </h1>
             <p className="mt-4 max-w-3xl leading-8 text-gray-600 dark:text-gray-300">
-              This policy explains how SkillBridge handles data for learning,
+              This policy explains how MentorForge handles data for learning,
               tutor booking, payment, dashboard, notification, and certificate
               features.
             </p>
@@ -79,7 +79,7 @@ export default function PrivacyPage() {
         </div>
 
         <p className="mt-8 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-7 text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-100">
-          This privacy policy is project documentation for SkillBridge. For a
+          This privacy policy is project documentation for MentorForge. For a
           real production launch, review it with legal and compliance guidance.
         </p>
       </div>

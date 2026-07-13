@@ -35,7 +35,7 @@ export async function generateMetadata({
   const blog = await getBlog(id);
 
   return {
-    title: blog ? `${blog.title} | SkillBridge Blog` : "Blog | SkillBridge",
+    title: blog ? `${blog.title} | MentorForge Blog` : "Blog | MentorForge",
     description: blog?.excerpt,
   };
 }
@@ -92,7 +92,7 @@ export default async function BlogDetailsPage({
               {blog.excerpt}
             </p>
             <div className="mt-5 border-b border-gray-200 pb-5 text-sm text-gray-500 dark:border-gray-800">
-              By {blog.author?.name || "SkillBridge"} ·{" "}
+              By {blog.author?.name || "MentorForge"} ·{" "}
               {new Date(blog.createdAt).toLocaleDateString("en-US", {
                 dateStyle: "long",
               })}

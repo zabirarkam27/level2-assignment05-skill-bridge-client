@@ -139,7 +139,7 @@ export default async function Home() {
               </h2>
             </div>
             <p className="text-base leading-8 text-gray-600 dark:text-gray-300">
-              Students do not need to guess what happens next. SkillBridge
+              Students do not need to guess what happens next. MentorForge
               moves each session through a clear flow: choose, pay, book,
               confirm, complete, review, and download records.
             </p>
@@ -404,7 +404,7 @@ export default async function Home() {
                 Learning guides
               </p>
               <h2 className="mt-3 text-3xl font-bold tracking-tight">
-                Read practical notes from SkillBridge.
+                Read practical notes from MentorForge.
               </h2>
             </div>
             <Link
@@ -462,7 +462,7 @@ export default async function Home() {
                   {review.comment}
                 </p>
                 <p className="mt-4 text-xs font-semibold text-gray-500">
-                  SkillBridge student
+                  MentorForge student
                 </p>
               </blockquote>
             ))}

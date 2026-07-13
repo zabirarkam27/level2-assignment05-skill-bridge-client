@@ -152,7 +152,7 @@ export default function PaymentHistory({ role }: PaymentHistoryProps) {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `skillbridge-invoice-${payment.transactionId}.pdf`;
+      link.download = `mentorforge-invoice-${payment.transactionId}.pdf`;
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -223,8 +223,8 @@ export default function PaymentHistory({ role }: PaymentHistoryProps) {
             <div class="invoice">
               <div class="header">
                 <div>
-                  <h1>SkillBridge Invoice</h1>
-                  <p>Thank you for learning with SkillBridge.</p>
+                  <h1>MentorForge Invoice</h1>
+                  <p>Thank you for learning with MentorForge.</p>
                 </div>
                 <div class="badge">${safeInvoice.status}</div>
               </div>
@@ -257,7 +257,7 @@ export default function PaymentHistory({ role }: PaymentHistoryProps) {
                   <div><p>Total Paid</p><p class="amount">${safeInvoice.amount}</p></div>
                   <div class="paid"><p>Payment</p><strong>${safeInvoice.status}</strong></div>
                 </div>
-                <p class="footer">This invoice confirms your SkillBridge booking and payment record.</p>
+                <p class="footer">This invoice confirms your MentorForge booking and payment record.</p>
               </div>
             </div>
           </div>
@@ -391,7 +391,7 @@ export default function PaymentHistory({ role }: PaymentHistoryProps) {
           {selectedInvoice && (
             <>
               <DialogHeader className="sr-only">
-                <DialogTitle>SkillBridge Invoice</DialogTitle>
+                <DialogTitle>MentorForge Invoice</DialogTitle>
               </DialogHeader>
               <div className="bg-slate-100 px-3 py-5 sm:px-4 sm:py-8">
                 <div className="mx-auto max-w-3xl overflow-hidden rounded-3xl bg-white shadow-2xl">
@@ -399,10 +399,10 @@ export default function PaymentHistory({ role }: PaymentHistoryProps) {
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                       <div>
                         <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-                          SkillBridge Invoice
+                          MentorForge Invoice
                         </h1>
                         <p className="mt-1 text-sm text-indigo-100">
-                          Thank you for learning with SkillBridge.
+                          Thank you for learning with MentorForge.
                         </p>
                       </div>
                       <div className="rounded-full bg-emerald-400/20 px-5 py-2 text-sm font-semibold text-emerald-100 ring-1 ring-emerald-300/40">
@@ -487,7 +487,7 @@ export default function PaymentHistory({ role }: PaymentHistoryProps) {
                     </div>
 
                     <p className="mt-8 text-center text-sm text-slate-500">
-                      This invoice confirms your SkillBridge booking and payment record.
+                      This invoice confirms your MentorForge booking and payment record.
                     </p>
                   </div>
                 </div>

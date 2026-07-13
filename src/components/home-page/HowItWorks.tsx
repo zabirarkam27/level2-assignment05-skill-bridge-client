@@ -42,7 +42,7 @@ export default function HowItWorks() {
       >
         <div className="max-w-2xl">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-            How Skill Bridge Works
+            How MentorForge Works
           </h2>
           <p className="mt-3 text-lg text-gray-600 dark:text-gray-300">
             A simple learning flow from discovery to verified feedback.

@@ -48,8 +48,8 @@ const socialLinks = [
     icon: Linkedin,
   },
   {
-    title: "Email SkillBridge",
-    url: "mailto:support@skillbridge.com",
+    title: "Email MentorForge",
+    url: "mailto:support@mentorforge.com",
     icon: Mail,
   },
 ];
@@ -67,14 +67,14 @@ export function Footer({ className }: FooterProps) {
           <div>
             <Link href="/" className="inline-flex items-center gap-2">
               <Image
-                src="/logo.png"
-                alt="SkillBridge Logo"
+                src="/mentorforge-icon.svg"
+                alt="MentorForge Logo"
                 width={38}
                 height={38}
-                className="dark:invert"
+               
               />
               <span className="bg-linear-to-r from-[#7b2a85] via-[#611f69] to-[#4a174f] bg-clip-text text-xl font-bold tracking-tight text-transparent dark:from-[#d8b4fe] dark:via-[#c084fc] dark:to-[#a855f7]">
-                SkillBridge
+                MentorForge
               </span>
             </Link>
             <p className="mt-4 max-w-sm text-sm leading-7">
@@ -127,11 +127,11 @@ export function Footer({ className }: FooterProps) {
             <div className="mt-4 space-y-3 text-sm">
               <p className="flex gap-3">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#611f69] dark:text-[#c084fc]" />
-                <span>123 SkillBridge Ave, Dhaka, Bangladesh</span>
+                <span>123 MentorForge Ave, Dhaka, Bangladesh</span>
               </p>
               <p className="flex gap-3">
                 <Mail className="mt-0.5 h-4 w-4 shrink-0 text-[#611f69] dark:text-[#c084fc]" />
-                <span>support@skillbridge.com</span>
+                <span>support@mentorforge.com</span>
               </p>
               <p className="flex gap-3">
                 <Phone className="mt-0.5 h-4 w-4 shrink-0 text-[#611f69] dark:text-[#c084fc]" />
@@ -166,7 +166,7 @@ export function Footer({ className }: FooterProps) {
         </div>
 
         <div className="flex flex-col gap-3 border-t border-gray-200 pt-6 text-sm text-gray-500 dark:border-gray-800 dark:text-gray-400 md:flex-row md:items-center md:justify-between">
-          <p>&copy; {new Date().getFullYear()} SkillBridge. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} MentorForge. All rights reserved.</p>
           <p>Built for secure tutor booking, payments, and learning records.</p>
         </div>
       </div>

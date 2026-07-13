@@ -27,7 +27,7 @@ export default function NewsletterSection() {
             Get notified about new courses and available mentors
           </h2>
           <p className="mt-4 max-w-2xl text-base leading-7 text-white/80">
-            Join the Skill Bridge update list for fresh course categories,
+            Join the MentorForge update list for fresh course categories,
             popular mentors, and booking availability highlights.
           </p>
 
@@ -71,7 +71,7 @@ export default function NewsletterSection() {
             </div>
             <div className="rounded-md border border-white/15 bg-white/10 p-4 text-sm leading-6 text-white/80">
               No spam, no payment alerts. Just relevant learning updates from
-              the Skill Bridge platform.
+              the MentorForge platform.
             </div>
           </div>
         </div>

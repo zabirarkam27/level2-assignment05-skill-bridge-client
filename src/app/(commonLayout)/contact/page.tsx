@@ -5,7 +5,7 @@ const contactCards = [
   {
     icon: Mail,
     title: "Email",
-    value: "support@skillbridge.com",
+    value: "support@mentorforge.com",
   },
   {
     icon: Phone,
@@ -15,14 +15,14 @@ const contactCards = [
   {
     icon: MapPin,
     title: "Office",
-    value: "123 SkillBridge Ave, Dhaka",
+    value: "123 MentorForge Ave, Dhaka",
   },
 ];
 
 export const metadata = {
-  title: "Contact Us | SkillBridge",
+  title: "Contact Us | MentorForge",
   description:
-    "Contact the SkillBridge team for support, partnership, and learning help.",
+    "Contact the MentorForge team for support, partnership, and learning help.",
 };
 
 export default function ContactPage() {
@@ -38,7 +38,7 @@ export default function ContactPage() {
           </h1>
           <p className="mx-auto mt-3 max-w-2xl text-gray-600 dark:text-gray-300">
             Need help choosing a tutor, managing a booking, or joining as a
-            mentor? Send us a message and the SkillBridge team will get back to
+            mentor? Send us a message and the MentorForge team will get back to
             you.
           </p>
         </div>

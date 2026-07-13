@@ -43,10 +43,10 @@ const toGoogleCalendarDate = (date: Date) => {
 const buildGoogleCalendarUrl = (booking: Booking) => {
   const startDate = new Date(booking.dateTime);
   const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
-  const courseTitle = booking.course?.title ?? "SkillBridge Session";
+  const courseTitle = booking.course?.title ?? "MentorForge Session";
   const tutorName = booking.tutor?.user.name ?? "Tutor";
   const details = [
-    `SkillBridge tutoring session with ${tutorName}.`,
+    `MentorForge tutoring session with ${tutorName}.`,
     booking.course?.category?.name ? `Category: ${booking.course.category.name}` : "",
     booking.meetingLink ? `Google Meet: ${booking.meetingLink}` : "",
   ].filter(Boolean).join("\n");
@@ -330,7 +330,7 @@ export default function StudentBookingsPage() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `skillbridge-certificate-${certificateNo ?? booking.courseId}.pdf`;
+      link.download = `mentorforge-certificate-${certificateNo ?? booking.courseId}.pdf`;
       document.body.appendChild(link);
       link.click();
       link.remove();

@@ -102,7 +102,7 @@ function CertificatePreview({ certificate }: { certificate: Certificate }) {
   const courseTitle = certificate.course?.title ?? "Course";
   const category = certificate.course?.category?.name ?? "Professional Learning";
   const instructor =
-    certificate.course?.tutor?.name ?? "SkillBridge Instructor";
+    certificate.course?.tutor?.name ?? "MentorForge Instructor";
 
   return (
     <div className="bg-slate-100 px-3 py-5 print:bg-white sm:px-4 sm:py-8">
@@ -113,7 +113,7 @@ function CertificatePreview({ certificate }: { certificate: Certificate }) {
         <div className="flex h-full flex-col border border-[#e3c36f] px-3 py-3 text-center sm:px-8 sm:py-7">
           <div className="flex items-start justify-between gap-4">
             <div className="text-left">
-              <p className="text-base font-bold text-[#611f69] sm:text-2xl">SkillBridge</p>
+              <p className="text-base font-bold text-[#611f69] sm:text-2xl">MentorForge</p>
               <p className="mt-1 text-[8px] font-semibold uppercase tracking-[0.16em] text-amber-700 sm:text-xs sm:tracking-[0.24em]">
                 Official Certification
               </p>
@@ -264,7 +264,7 @@ export default function CertificateList({ mode }: CertificateListProps) {
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `skillbridge-certificate-${certificate.certificateNo}.pdf`;
+      link.download = `mentorforge-certificate-${certificate.certificateNo}.pdf`;
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -279,9 +279,9 @@ export default function CertificateList({ mode }: CertificateListProps) {
   };
 
   const shareOnLinkedIn = (certificate: Certificate) => {
-    const course = certificate.course?.title ?? "a SkillBridge course";
+    const course = certificate.course?.title ?? "a MentorForge course";
     const verifyUrl = getVerificationUrl(certificate);
-    const text = `I successfully completed ${course} on SkillBridge. Verify my certificate: ${verifyUrl}`;
+    const text = `I successfully completed ${course} on MentorForge. Verify my certificate: ${verifyUrl}`;
     window.open(
       `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
         verifyUrl,
@@ -298,7 +298,7 @@ export default function CertificateList({ mode }: CertificateListProps) {
       certificate.course?.category?.name ?? "Professional Learning",
     );
     const instructor = htmlEscape(
-      certificate.course?.tutor?.name ?? "SkillBridge Instructor",
+      certificate.course?.tutor?.name ?? "MentorForge Instructor",
     );
     const certificateNo = htmlEscape(certificate.certificateNo);
     const issuedAt = htmlEscape(formatDate(certificate.issuedAt));
@@ -347,7 +347,7 @@ export default function CertificateList({ mode }: CertificateListProps) {
               <div class="inner">
                 <div class="top">
                   <div class="brand">
-                    <h1>SkillBridge</h1>
+                    <h1>MentorForge</h1>
                     <p>Official Certification</p>
                   </div>
                   <div class="qr-wrap"><div class="qr">${qrSvg}</div><p class="qr-label">Scan to Verify</p></div>
@@ -520,7 +520,7 @@ export default function CertificateList({ mode }: CertificateListProps) {
           {selectedCertificate && (
             <>
               <DialogHeader className="sr-only">
-                <DialogTitle>SkillBridge Certificate</DialogTitle>
+                <DialogTitle>MentorForge Certificate</DialogTitle>
               </DialogHeader>
               <CertificatePreview certificate={selectedCertificate} />
               <div className="flex flex-wrap justify-center gap-3 border-t border-slate-200 bg-white px-6 py-5 dark:border-gray-700 dark:bg-gray-900">

@@ -59,7 +59,7 @@ export default async function CertificateVerificationPage({
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
                   <p className="text-sm font-medium opacity-80">
-                    SkillBridge Verification
+                    MentorForge Verification
                   </p>
                   <h1 className="mt-1 text-3xl font-bold">
                     Certificate Verified
@@ -111,7 +111,7 @@ export default async function CertificateVerificationPage({
                     Course Category
                   </p>
                   <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-white">
-                    {certificate.course?.category?.name ?? "SkillBridge"}
+                    {certificate.course?.category?.name ?? "MentorForge"}
                   </p>
                 </div>
                 <div>
@@ -119,7 +119,7 @@ export default async function CertificateVerificationPage({
                     Instructor
                   </p>
                   <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-white">
-                    {certificate.course?.tutor?.name ?? "SkillBridge Instructor"}
+                    {certificate.course?.tutor?.name ?? "MentorForge Instructor"}
                   </p>
                 </div>
               </div>
@@ -128,7 +128,7 @@ export default async function CertificateVerificationPage({
                 <Button asChild variant="outline">
                   <Link href="/courses">
                     <ExternalLink className="mr-2 h-4 w-4" />
-                    Explore SkillBridge Courses
+                    Explore MentorForge Courses
                   </Link>
                 </Button>
               </div>

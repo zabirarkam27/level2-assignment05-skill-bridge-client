@@ -181,7 +181,7 @@ export default function DashboardLayout({
             href="/"
             className="font-semibold text-[#611f69] transition-colors hover:text-[#4a174f] dark:text-[#c084fc] dark:hover:text-[#d8b4fe]"
           >
-            SkillBridge
+            MentorForge
           </Link>
           <div className="ml-auto">
             <NotificationBell />

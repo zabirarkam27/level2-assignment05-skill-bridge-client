@@ -1,6 +1,6 @@
-# SkillBridge Client
+# MentorForge Client
 
-Frontend for the Assignment 5 SkillBridge full-stack project.
+Frontend for the Assignment 5 MentorForge full-stack project.
 
 ## Live Links
 
@@ -17,7 +17,7 @@ Frontend for the Assignment 5 SkillBridge full-stack project.
 
 ### Admin
 
-- Email: `admin@skillbridge.com`
+- Email: `admin@mentorforge.com`
 - Password: `admin1234`
 
 ### Student

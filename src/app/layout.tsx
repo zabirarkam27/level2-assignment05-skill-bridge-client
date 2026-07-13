@@ -5,9 +5,14 @@ import { Toaster } from "sonner";
 import { SessionProvider } from "@/context/SessionContext";
 
 export const metadata: Metadata = {
-  title: "SkillBridge — Connect with Expert Tutors",
+  title: "MentorForge — Connect with Expert Tutors",
   description:
-    "SkillBridge connects learners with expert tutors. Browse tutor profiles, book sessions, and level up your skills.",
+    "MentorForge connects learners with expert tutors. Browse tutor profiles, book sessions, and level up your skills.",
+  icons: {
+    icon: "/mentorforge-icon.svg",
+    shortcut: "/mentorforge-icon.svg",
+    apple: "/mentorforge-icon.svg",
+  },
 };
 
 export default function RootLayout({

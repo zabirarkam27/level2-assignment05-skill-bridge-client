@@ -9,14 +9,14 @@ import {
 
 const faqs = [
   {
-    question: "How do I book a tutor on SkillBridge?",
+    question: "How do I book a tutor on MentorForge?",
     answer:
       "Browse mentors, open a tutor profile, choose an available slot, pay securely, and then the booking request is created for tutor confirmation.",
   },
   {
     question: "Do students pay before tutor confirmation?",
     answer:
-      "Yes. SkillBridge uses a payment-first flow. Tutors and admins can verify that payment is completed before confirming a pending session.",
+      "Yes. MentorForge uses a payment-first flow. Tutors and admins can verify that payment is completed before confirming a pending session.",
   },
   {
     question: "Can students cancel confirmed sessions?",
@@ -34,7 +34,7 @@ const faqs = [
       "Students can view payment history, open invoice previews, print or download invoices, and download certificates after eligible sessions are completed.",
   },
   {
-    question: "Does SkillBridge support notifications and wishlists?",
+    question: "Does MentorForge support notifications and wishlists?",
     answer:
       "Yes. Students, tutors, and admins get dashboard notifications. Students can also save favorite courses and tutors to a wishlist.",
   },
@@ -56,7 +56,7 @@ export default function FAQSection() {
           <p className="mt-4 max-w-xl text-lg leading-8 text-gray-600 dark:text-gray-300">
             Clear answers about payments, booking confirmation, cancellation,
             records, notifications, and how learning sessions work on
-            SkillBridge.
+            MentorForge.
           </p>
         </div>
 

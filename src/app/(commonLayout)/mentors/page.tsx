@@ -1,9 +1,9 @@
 import AllMentors from "@/components/mentors/allMentors";
 
 export const metadata = {
-  title: "Mentors | SkillBridge",
+  title: "Mentors | MentorForge",
   description:
-    "Browse all expert mentors on SkillBridge and book your personalized learning session today.",
+    "Browse all expert mentors on MentorForge and book your personalized learning session today.",
 };
 
 export default function MentorsPage() {

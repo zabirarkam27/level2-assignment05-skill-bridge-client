@@ -12,8 +12,8 @@ import {
 } from "lucide-react";
 
 export const metadata = {
-  title: "About | SkillBridge",
-  description: "Learn how SkillBridge connects students with trusted mentors.",
+  title: "About | MentorForge",
+  description: "Learn how MentorForge connects students with trusted mentors.",
 };
 
 const values = [
@@ -81,7 +81,7 @@ export default function AboutPage() {
               A smarter bridge between students, tutors, and real progress.
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-8 text-gray-600 dark:text-gray-300 md:text-lg">
-              SkillBridge brings discovery, paid booking, tutor confirmation,
+              MentorForge brings discovery, paid booking, tutor confirmation,
               session records, invoices, reviews, certificates, notifications,
               and dashboards into one organized learning workflow.
             </p>
@@ -147,7 +147,7 @@ export default function AboutPage() {
             a clean place to manage availability, sessions, courses, reviews,
             and earnings. Admins need visibility across users, bookings,
             payments, courses, contact messages, and platform activity.
-            SkillBridge ties those needs together with a workflow that is
+            MentorForge ties those needs together with a workflow that is
             practical for real learning.
           </p>
         </div>
