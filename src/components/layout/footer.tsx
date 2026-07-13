@@ -34,12 +34,12 @@ const quickLinks = [
 const socialLinks = [
   {
     title: "Client Repository",
-    url: "https://github.com/zabirarkam27/level2-assignment05-skill-bridge-client",
+    url: "https://github.com/zabirarkam27/level2-assignment05-mentor-forge-client",
     icon: Github,
   },
   {
     title: "Server Repository",
-    url: "https://github.com/zabirarkam27/level2-assignment05-skill-bridge-server",
+    url: "https://github.com/zabirarkam27/level2-assignment05-mentor-forge-server",
     icon: ExternalLink,
   },
   {
