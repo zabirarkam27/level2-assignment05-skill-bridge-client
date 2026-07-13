@@ -1,5 +1,6 @@
 import AllCourses from "@/components/courses/allCourses";
 import { BookOpen } from "lucide-react";
+import { Suspense } from "react";
 
 export default function CoursesPage() {
   return (
@@ -16,7 +17,9 @@ export default function CoursesPage() {
           </p>
         </div>
       </div>
-      <AllCourses emptyMessage="No courses have been published yet." />
+      <Suspense fallback={null}>
+        <AllCourses emptyMessage="No courses have been published yet." />
+      </Suspense>
     </div>
   );
 }

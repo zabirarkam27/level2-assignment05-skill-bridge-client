@@ -13,10 +13,20 @@ Frontend for the Assignment 5 SkillBridge full-stack project.
 - [Frontend Repository](https://github.com/zabirarkam27/level2-assignment05-skill-bridge-client)
 - [Backend Repository](https://github.com/zabirarkam27/level2-assignment05-skill-bridge-server)
 
-## Admin Credentials
+## Demo Credentials
+
+### Admin
 
 - Email: `admin@skillbridge.com`
 - Password: `admin1234`
+
+### Student
+
+- Use the registration page to create a student account, or use Google login with an allowed account.
+
+### Tutor
+
+- Create a tutor account from registration, then approve it from the admin dashboard before testing tutor features.
 
 Run the backend admin seed before testing these credentials.
 
@@ -41,5 +51,5 @@ Run the backend admin seed before testing these credentials.
 ## Payment Flow
 
 Students select a tutor, course, available slot, and date. The app then opens
-SSLCommerz payment. A booking is created only after successful payment, then the
-tutor can confirm the pending session.
+Stripe Checkout. A booking is created only after successful payment, then the
+tutor can confirm the paid pending session.

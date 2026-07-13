@@ -1,6 +1,4 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { ContactForm } from "@/components/contact/ContactForm";
 import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 
 const contactCards = [
@@ -70,47 +68,7 @@ export default function ContactPage() {
           ))}
         </div>
 
-        <form className="rounded-lg border border-gray-100 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Name
-              </label>
-              <Input placeholder="Your full name" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Email
-              </label>
-              <Input type="email" placeholder="you@example.com" />
-            </div>
-          </div>
-
-          <div className="mt-4 space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Subject
-            </label>
-            <Input placeholder="How can we help?" />
-          </div>
-
-          <div className="mt-4 space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Message
-            </label>
-            <Textarea
-              rows={6}
-              placeholder="Tell us a little more about your question..."
-              className="resize-none"
-            />
-          </div>
-
-          <Button
-            type="button"
-            className="mt-6 bg-[#611f69] text-white hover:bg-[#4a174f] dark:bg-[#c084fc] dark:text-black dark:hover:bg-[#d8b4fe]"
-          >
-            Send Message
-          </Button>
-        </form>
+        <ContactForm />
       </section>
     </div>
   );

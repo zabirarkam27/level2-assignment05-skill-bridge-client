@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AppUser } from "@/types/routes.type";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,11 +31,26 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { getAvatarUrl } from "@/lib/avatar";
 import CategorySubjectPicker from "@/components/CategorySubjectPicker";
+import {
+  DataListControls,
+  SortDirection,
+} from "@/components/data-list/DataListControls";
+import { compareValues, paginateItems } from "@/lib/data-list";
+
+const mentorCandidateSortOptions = [
+  { label: "Name", value: "name" },
+  { label: "Email", value: "email" },
+  { label: "Newest", value: "createdAt" },
+];
 
 export default function AdminMentorsPage() {
   const [users, setUsers] = useState<AppUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState("name");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [showPromoteDialog, setShowPromoteDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState<AppUser | null>(null);
   const [promoting, setpromoting] = useState(false);
@@ -77,6 +92,10 @@ export default function AdminMentorsPage() {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, sortBy, sortDirection, pageSize]);
 
   const handlePromote = async () => {
     if (!selectedUser) return;
@@ -135,11 +154,32 @@ export default function AdminMentorsPage() {
     }
   };
 
-  const filteredUsers = users.filter(
-    (u) =>
-      u.role === "STUDENT" &&
-      (u.name.toLowerCase().includes(search.toLowerCase()) ||
-        u.email.toLowerCase().includes(search.toLowerCase())),
+  const filteredUsers = useMemo(
+    () =>
+      users.filter(
+        (u) =>
+          u.role === "STUDENT" &&
+          (u.name.toLowerCase().includes(search.toLowerCase()) ||
+            u.email.toLowerCase().includes(search.toLowerCase())),
+      ),
+    [users, search],
+  );
+  const sortedUsers = useMemo(
+    () =>
+      [...filteredUsers].sort((first, second) => {
+        const getValue = (user: AppUser) => {
+          if (sortBy === "email") return user.email;
+          if (sortBy === "createdAt") return new Date(user.createdAt ?? 0);
+          return user.name;
+        };
+
+        return compareValues(getValue(first), getValue(second), sortDirection);
+      }),
+    [filteredUsers, sortBy, sortDirection],
+  );
+  const paginatedUsers = useMemo(
+    () => paginateItems(sortedUsers, page, pageSize),
+    [sortedUsers, page, pageSize],
   );
 
   return (
@@ -166,7 +206,7 @@ export default function AdminMentorsPage() {
         </TabsList>
 
         <TabsContent value="promote" className="space-y-4">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="relative w-full max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
@@ -176,6 +216,20 @@ export default function AdminMentorsPage() {
                 className="pl-10 h-11"
               />
             </div>
+            {!loading && (
+              <DataListControls
+                totalItems={sortedUsers.length}
+                page={page}
+                pageSize={pageSize}
+                sortBy={sortBy}
+                sortDirection={sortDirection}
+                sortOptions={mentorCandidateSortOptions}
+                onPageChange={setPage}
+                onPageSizeChange={setPageSize}
+                onSortByChange={setSortBy}
+                onSortDirectionChange={setSortDirection}
+              />
+            )}
           </div>
 
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
@@ -183,7 +237,7 @@ export default function AdminMentorsPage() {
               <div className="p-8 text-center text-gray-500">
                 Loading users...
               </div>
-            ) : filteredUsers.length === 0 ? (
+            ) : sortedUsers.length === 0 ? (
               <div className="p-16 text-center">
                 <Users className="w-12 h-12 mx-auto text-gray-300 mb-4" />
                 <p className="text-gray-500">
@@ -192,7 +246,7 @@ export default function AdminMentorsPage() {
               </div>
             ) : (
               <div className="divide-y divide-gray-50 dark:divide-gray-800">
-                {filteredUsers.map((user, i) => (
+                {paginatedUsers.map((user, i) => (
                   <motion.div
                     key={user.id}
                     initial={{ opacity: 0 }}

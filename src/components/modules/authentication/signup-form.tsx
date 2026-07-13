@@ -21,6 +21,7 @@ import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import * as z from "zod";
 import { authClient } from "@/lib/auth-client";
+import { getSocialAuthCallbackUrl } from "@/lib/auth-redirect";
 
 const formSchema = z.object({
   name: z.string().min(4, "Name must be at least 4 characters"),
@@ -82,7 +83,8 @@ export function SignupForm(props: React.ComponentProps<typeof Card>) {
   const handleGoogleSignup = async () => {
     await authClient.signIn.social({
       provider: "google",
-      callbackURL: `${process.env.NEXT_PUBLIC_APP_URL}`,
+      callbackURL: getSocialAuthCallbackUrl(),
+      errorCallbackURL: `${getSocialAuthCallbackUrl()}?error=google`,
     });
   };
 

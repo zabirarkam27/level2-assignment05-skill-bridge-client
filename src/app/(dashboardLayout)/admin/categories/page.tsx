@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Category } from "@/types/routes.type";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import {
   Check,
   Pencil,
   Loader2,
+  Search,
 } from "lucide-react";
 import Image from "next/image";
 import {
@@ -25,6 +26,16 @@ import {
 } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
 import { uploadOptimizedImage } from "@/lib/upload-image";
+import {
+  DataListControls,
+  SortDirection,
+} from "@/components/data-list/DataListControls";
+import { compareValues, paginateItems } from "@/lib/data-list";
+
+const categorySortOptions = [
+  { label: "Name", value: "name" },
+  { label: "Description", value: "description" },
+];
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -40,6 +51,11 @@ export default function AdminCategoriesPage() {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
   const [confirmDelete, setConfirmDelete] = useState<Category | null>(null);
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState("name");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const [form, setForm] = useState({
     name: "",
@@ -77,6 +93,37 @@ export default function AdminCategoriesPage() {
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, sortBy, sortDirection, pageSize]);
+
+  const filteredCategories = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
+    if (!query) return categories;
+
+    return categories.filter((category) =>
+      [category.name, category.description]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(query)),
+    );
+  }, [categories, search]);
+
+  const sortedCategories = useMemo(
+    () =>
+      [...filteredCategories].sort((first, second) => {
+        const getValue = (category: Category) =>
+          sortBy === "description" ? category.description : category.name;
+
+        return compareValues(getValue(first), getValue(second), sortDirection);
+      }),
+    [filteredCategories, sortBy, sortDirection],
+  );
+  const paginatedCategories = useMemo(
+    () => paginateItems(sortedCategories, page, pageSize),
+    [sortedCategories, page, pageSize],
+  );
 
   const handleCreate = async () => {
     if (!form.name.trim()) return;
@@ -231,9 +278,35 @@ export default function AdminCategoriesPage() {
         </Button>
       </div>
 
+      <div className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="relative w-full lg:max-w-xs">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Filter categories..."
+            className="pl-9"
+          />
+        </div>
+        {!loading && (
+          <DataListControls
+            totalItems={sortedCategories.length}
+            page={page}
+            pageSize={pageSize}
+            sortBy={sortBy}
+            sortDirection={sortDirection}
+            sortOptions={categorySortOptions}
+            onPageChange={setPage}
+            onPageSizeChange={setPageSize}
+            onSortByChange={setSortBy}
+            onSortDirectionChange={setSortDirection}
+          />
+        )}
+      </div>
+
       {/* Loading */}
       {loading ? (
-        <div className="grid auto-rows-fr grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid auto-rows-fr grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
             <div
               key={i}
@@ -242,8 +315,8 @@ export default function AdminCategoriesPage() {
           ))}
         </div>
       ) : (
-        <div className="grid auto-rows-fr grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {categories.map((cat, i) => (
+        <div className="grid auto-rows-fr grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {paginatedCategories.map((cat, i) => (
             <motion.div
               key={cat.id}
               initial={{ opacity: 0, y: 15 }}
@@ -336,9 +409,10 @@ export default function AdminCategoriesPage() {
 
           <div className="space-y-4 py-2">
             <div>
-              <label className="block text-sm font-medium mb-1.5">Name *</label>
+              <label htmlFor="category-name" className="block text-sm font-medium mb-1.5">Name *</label>
 
               <Input
+                id="category-name"
                 value={form.name}
                 onChange={(e) =>
                   setForm((f) => ({
@@ -351,11 +425,12 @@ export default function AdminCategoriesPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1.5">
+              <label htmlFor="category-description" className="block text-sm font-medium mb-1.5">
                 Description
               </label>
 
               <Textarea
+                id="category-description"
                 value={form.description}
                 onChange={(e) =>
                   setForm((f) => ({
@@ -369,11 +444,12 @@ export default function AdminCategoriesPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1.5">
+              <label htmlFor="category-image-file" className="block text-sm font-medium mb-1.5">
                 Upload Image (optional)
               </label>
 
               <input
+                id="category-image-file"
                 type="file"
                 accept="image/*"
                 title="Upload category image"
@@ -395,11 +471,12 @@ export default function AdminCategoriesPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1.5">
+              <label htmlFor="category-image-url" className="block text-sm font-medium mb-1.5">
                 Image URL
               </label>
 
               <Input
+                id="category-image-url"
                 value={form.image}
                 onChange={(e) =>
                   setForm((f) => ({

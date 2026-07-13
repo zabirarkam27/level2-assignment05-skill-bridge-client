@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { AppUser, Category, Course } from "@/types/routes.type";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ import {
   Pencil,
   Star,
   Loader2,
+  Search,
 } from "lucide-react";
 import {
   Dialog,
@@ -29,6 +30,11 @@ import { Badge } from "@/components/ui/badge";
 import { uploadOptimizedImage } from "@/lib/upload-image";
 import { useSessionContext } from "@/context/SessionContext";
 import ConfirmActionDialog from "@/components/ConfirmActionDialog";
+import {
+  DataListControls,
+  SortDirection,
+} from "@/components/data-list/DataListControls";
+import { compareValues, paginateItems } from "@/lib/data-list";
 
 const PLACEHOLDER_IMAGE =
   "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80";
@@ -48,6 +54,14 @@ type CourseDeleteRequest = {
   };
   createdAt: string;
 };
+
+const courseSortOptions = [
+  { label: "Newest", value: "createdAt" },
+  { label: "Title", value: "title" },
+  { label: "Category", value: "category" },
+  { label: "Instructor", value: "instructor" },
+  { label: "Popular", value: "popular" },
+];
 
 export default function CourseManager({ mode }: CourseManagerProps) {
   const isAdmin = mode === "admin";
@@ -72,6 +86,11 @@ export default function CourseManager({ mode }: CourseManagerProps) {
   const [tutorCourseTab, setTutorCourseTab] = useState<"mine" | "others">(
     "mine",
   );
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const [form, setForm] = useState({
     title: "",
@@ -161,6 +180,10 @@ export default function CourseManager({ mode }: CourseManagerProps) {
     fetchTutors();
     fetchDeleteRequests();
   }, [fetchCategories, fetchCourses, fetchTutors, fetchDeleteRequests]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, tutorCourseTab, sortBy, sortDirection, pageSize]);
 
   const uploadImage = async (file: File) => {
     setUploadingImage(true);
@@ -346,11 +369,48 @@ export default function CourseManager({ mode }: CourseManagerProps) {
   const coursesByOthers = courses.filter(
     (course) => course.createdBy.id !== user?.id,
   );
-  const visibleCourses = isAdmin
+  const tabCourses = isAdmin
     ? courses
     : tutorCourseTab === "mine"
       ? myCourses
       : coursesByOthers;
+  const visibleCourses = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
+    if (!query) return tabCourses;
+
+    return tabCourses.filter((course) =>
+      [
+        course.title,
+        course.category?.name,
+        course.tutor?.name,
+        course.createdBy?.name,
+      ]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(query)),
+    );
+  }, [tabCourses, search]);
+  const sortedCourses = useMemo(
+    () =>
+      [...visibleCourses].sort((first, second) => {
+        const getValue = (course: Course) => {
+          if (sortBy === "title") return course.title;
+          if (sortBy === "category") return course.category?.name;
+          if (sortBy === "instructor") {
+            return course.tutor?.name ?? course.createdBy?.name;
+          }
+          if (sortBy === "popular") return course.isPopular;
+          return new Date(course.createdAt);
+        };
+
+        return compareValues(getValue(first), getValue(second), sortDirection);
+      }),
+    [visibleCourses, sortBy, sortDirection],
+  );
+  const paginatedCourses = useMemo(
+    () => paginateItems(sortedCourses, page, pageSize),
+    [sortedCourses, page, pageSize],
+  );
   const visibleCourseCount = visibleCourses.length;
   const canEditCourse = (course: Course) =>
     isAdmin || course.tutorId === user?.id;
@@ -414,6 +474,32 @@ export default function CourseManager({ mode }: CourseManagerProps) {
         </div>
       )}
 
+      <div className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="relative w-full lg:max-w-xs">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Filter courses, category, instructor..."
+            className="pl-9"
+          />
+        </div>
+        {!loading && (
+          <DataListControls
+            totalItems={sortedCourses.length}
+            page={page}
+            pageSize={pageSize}
+            sortBy={sortBy}
+            sortDirection={sortDirection}
+            sortOptions={courseSortOptions}
+            onPageChange={setPage}
+            onPageSizeChange={setPageSize}
+            onSortByChange={setSortBy}
+            onSortDirectionChange={setSortDirection}
+          />
+        )}
+      </div>
+
       {isAdmin && deleteRequests.length > 0 && (
         <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/40 dark:bg-amber-900/20">
           <div className="mb-3 flex items-center justify-between gap-3">
@@ -473,7 +559,7 @@ export default function CourseManager({ mode }: CourseManagerProps) {
       )}
 
       {loading ? (
-        <div className="grid auto-rows-fr grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid auto-rows-fr grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
@@ -481,7 +567,7 @@ export default function CourseManager({ mode }: CourseManagerProps) {
             />
           ))}
         </div>
-      ) : visibleCourses.length === 0 ? (
+      ) : sortedCourses.length === 0 ? (
         <div className="rounded-xl border border-dashed border-gray-200 py-16 text-center dark:border-gray-700">
           <BookOpen className="mx-auto mb-3 h-10 w-10 text-gray-300" />
           <p className="text-sm text-gray-500">
@@ -491,8 +577,8 @@ export default function CourseManager({ mode }: CourseManagerProps) {
           </p>
         </div>
       ) : (
-        <div className="grid auto-rows-fr grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {visibleCourses.map((course, i) => (
+        <div className="grid auto-rows-fr grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {paginatedCourses.map((course, i) => (
             <motion.div
               key={course.id}
               initial={{ opacity: 0, y: 15 }}
@@ -632,10 +718,11 @@ export default function CourseManager({ mode }: CourseManagerProps) {
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div>
-              <label className="mb-1.5 block text-sm font-medium">
+              <label htmlFor="course-title" className="mb-1.5 block text-sm font-medium">
                 Title *
               </label>
               <Input
+                id="course-title"
                 value={form.title}
                 onChange={(e) =>
                   setForm((f) => ({ ...f, title: e.target.value }))
@@ -644,10 +731,11 @@ export default function CourseManager({ mode }: CourseManagerProps) {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium">
+              <label htmlFor="course-category" className="mb-1.5 block text-sm font-medium">
                 Category *
               </label>
               <select
+                id="course-category"
                 title="Course category"
                 value={form.categoryId}
                 onChange={(e) =>
@@ -670,10 +758,11 @@ export default function CourseManager({ mode }: CourseManagerProps) {
             </div>
             {isAdmin && (
               <div>
-                <label className="mb-1.5 block text-sm font-medium">
+                <label htmlFor="course-instructor" className="mb-1.5 block text-sm font-medium">
                   Instructor *
                 </label>
                 <select
+                  id="course-instructor"
                   title="Course instructor"
                   value={form.tutorId}
                   onChange={(e) =>
@@ -696,10 +785,11 @@ export default function CourseManager({ mode }: CourseManagerProps) {
               </div>
             )}
             <div>
-              <label className="mb-1.5 block text-sm font-medium">
+              <label htmlFor="course-description" className="mb-1.5 block text-sm font-medium">
                 Description
               </label>
               <Textarea
+                id="course-description"
                 value={form.description}
                 onChange={(e) =>
                   setForm((f) => ({ ...f, description: e.target.value }))
@@ -709,10 +799,11 @@ export default function CourseManager({ mode }: CourseManagerProps) {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium">
+              <label htmlFor="course-cover-file" className="mb-1.5 block text-sm font-medium">
                 Cover image
               </label>
               <input
+                id="course-cover-file"
                 type="file"
                 accept="image/*"
                 title="Upload course image"
@@ -729,6 +820,7 @@ export default function CourseManager({ mode }: CourseManagerProps) {
                 </p>
               )}
               <Input
+                id="course-cover-url"
                 className="mt-2"
                 value={form.image}
                 onChange={(e) =>

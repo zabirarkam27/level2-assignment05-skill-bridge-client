@@ -18,6 +18,7 @@ export default function CategoryCoursesSection() {
   } = useCategoryCourses();
 
   const activeCategory = categories.find((c) => c.id === activeCategoryId);
+  const visibleCourses = courses.slice(0, 4);
   const emptyMessage = activeCategory
     ? `No courses in ${activeCategory.name} yet.`
     : "No courses available yet.";
@@ -65,9 +66,10 @@ export default function CategoryCoursesSection() {
 
         <div className="mt-10">
           <CourseGrid
-            courses={courses}
+            courses={visibleCourses}
             loading={isInitialLoading}
             emptyMessage={emptyMessage}
+            skeletonCount={4}
             filterKey={activeCategoryId}
           />
         </div>

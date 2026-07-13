@@ -17,6 +17,7 @@ export default function CategorySubjectPicker({
   onChange,
   label = "Subjects",
 }: CategorySubjectPickerProps) {
+  const selectId = `${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-select`;
   const [categories, setCategories] = useState<Category[]>([]);
   const [selected, setSelected] = useState("");
   const [subjectToRemove, setSubjectToRemove] = useState<string | null>(null);
@@ -64,11 +65,12 @@ export default function CategorySubjectPicker({
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+      <label htmlFor={selectId} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
         {label}
       </label>
       <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
         <select
+          id={selectId}
           title={label}
           value={selected}
           onChange={(event) => setSelected(event.target.value)}

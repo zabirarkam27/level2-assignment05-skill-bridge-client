@@ -252,3 +252,23 @@ export interface AppUser {
     price: number;
   } | null;
 }
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  image?: string | null;
+  tags: string[];
+  isPublished: boolean;
+  authorId: string;
+  author?: {
+    id: string;
+    name: string;
+    email: string;
+    image?: string | null;
+    role: UserRole;
+  };
+  createdAt: string;
+  updatedAt: string;
+}

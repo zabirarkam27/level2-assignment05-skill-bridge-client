@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AppUser } from "@/types/routes.type";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,11 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { UserPlus } from "lucide-react";
 import ConfirmActionDialog from "@/components/ConfirmActionDialog";
+import {
+  DataListControls,
+  SortDirection,
+} from "@/components/data-list/DataListControls";
+import { compareValues, paginateItems } from "@/lib/data-list";
 
 type UserTab = "ALL" | "STUDENT" | "TUTOR";
 
@@ -35,6 +40,14 @@ const userTabs: { label: string; value: UserTab }[] = [
   { label: "All", value: "ALL" },
   { label: "Students", value: "STUDENT" },
   { label: "Tutors", value: "TUTOR" },
+];
+
+const userSortOptions = [
+  { label: "Name", value: "name" },
+  { label: "Email", value: "email" },
+  { label: "Role", value: "role" },
+  { label: "Status", value: "status" },
+  { label: "Newest", value: "createdAt" },
 ];
 
 function DeleteDialog({
@@ -98,6 +111,10 @@ export default function AdminUsersPage() {
   const [updating, setUpdating] = useState<string | null>(null);
   const [undoTarget, setUndoTarget] = useState<AppUser | null>(null);
   const [statusTarget, setStatusTarget] = useState<AppUser | null>(null);
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const fetchUsers = async () => {
     try {
@@ -119,6 +136,10 @@ export default function AdminUsersPage() {
   useEffect(() => {
     setSearch(searchParams.get("search") ?? "");
   }, [searchParams]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, activeTab, sortBy, sortDirection, pageSize]);
 
   const toggleBan = async (userId: string, currentStatus: string) => {
     setUpdating(userId);
@@ -206,15 +227,36 @@ export default function AdminUsersPage() {
     }
   };
 
-  const filtered = users.filter(
-    (u) => {
+  const filtered = useMemo(
+    () => users.filter((u) => {
       const matchesTab = activeTab === "ALL" || u.role === activeTab;
       const matchesSearch =
         u.name.toLowerCase().includes(search.toLowerCase()) ||
         u.email.toLowerCase().includes(search.toLowerCase());
 
       return matchesTab && matchesSearch;
-    },
+    }),
+    [users, activeTab, search],
+  );
+
+  const sortedUsers = useMemo(
+    () =>
+      [...filtered].sort((first, second) => {
+        const getValue = (user: AppUser) => {
+          if (sortBy === "name") return user.name;
+          if (sortBy === "email") return user.email;
+          if (sortBy === "role") return user.role;
+          if (sortBy === "status") return user.status ?? "ACTIVE";
+          return new Date(user.createdAt ?? 0);
+        };
+
+        return compareValues(getValue(first), getValue(second), sortDirection);
+      }),
+    [filtered, sortBy, sortDirection],
+  );
+  const paginatedUsers = useMemo(
+    () => paginateItems(sortedUsers, page, pageSize),
+    [sortedUsers, page, pageSize],
   );
 
   return (
@@ -265,6 +307,23 @@ export default function AdminUsersPage() {
         </div>
       </div>
 
+      {!loading && (
+        <div className="mt-6">
+          <DataListControls
+            totalItems={sortedUsers.length}
+            page={page}
+            pageSize={pageSize}
+            sortBy={sortBy}
+            sortDirection={sortDirection}
+            sortOptions={userSortOptions}
+            onPageChange={setPage}
+            onPageSizeChange={setPageSize}
+            onSortByChange={setSortBy}
+            onSortDirectionChange={setSortDirection}
+          />
+        </div>
+      )}
+
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden mt-6">
         {loading ? (
           <div className="p-6 space-y-4">
@@ -281,13 +340,13 @@ export default function AdminUsersPage() {
           </div>
         ) : (
           <div className="divide-y divide-gray-100 dark:divide-gray-700">
-            {filtered.length === 0 ? (
+            {sortedUsers.length === 0 ? (
               <div className="text-center py-16 text-gray-400">
                 <Users className="w-10 h-10 mx-auto mb-2 opacity-40" />
                 <p className="text-sm">No users found</p>
               </div>
             ) : (
-              filtered.map((user, i) => (
+              paginatedUsers.map((user, i) => (
                 <motion.div
                   key={user.id}
                   initial={{ opacity: 0 }}

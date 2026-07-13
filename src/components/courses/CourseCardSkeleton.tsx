@@ -15,7 +15,7 @@ export function CourseCardSkeleton() {
 
 export function CourseGridSkeleton({ count = 6 }: { count?: number }) {
   return (
-    <div className="grid auto-rows-fr items-stretch gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid auto-rows-fr items-stretch gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
       {Array.from({ length: count }).map((_, i) => (
         <CourseCardSkeleton key={i} />
       ))}

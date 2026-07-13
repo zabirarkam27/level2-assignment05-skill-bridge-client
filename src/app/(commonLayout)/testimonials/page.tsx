@@ -46,7 +46,7 @@ export default function TestimonialsPage() {
 
       <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         {loading ? (
-          <div className="grid auto-rows-fr items-stretch gap-5 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid auto-rows-fr items-stretch gap-5 md:grid-cols-2 lg:grid-cols-4">
             {[1, 2, 3, 4, 5, 6].map((item) => (
               <div
                 key={item}
@@ -59,7 +59,7 @@ export default function TestimonialsPage() {
             No reviews have been published yet.
           </div>
         ) : (
-          <div className="grid auto-rows-fr items-stretch gap-5 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid auto-rows-fr items-stretch gap-5 md:grid-cols-2 lg:grid-cols-4">
             {reviews.map((item) => {
               const studentName = item.booking?.student?.name ?? "Student";
               const tutorName = item.booking?.tutor?.user?.name ?? "SkillBridge tutor";

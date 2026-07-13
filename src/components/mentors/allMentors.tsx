@@ -339,7 +339,7 @@ export default function AllMentors({ limit }: AllMentorsProps) {
 
         {/* Loading skeletons */}
         {loading && (
-          <div className="mt-10 grid auto-rows-fr items-stretch gap-6 py-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid auto-rows-fr items-stretch gap-6 py-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
             {Array.from({ length: limit || 6 }).map((_, i) => (
               <MentorSkeleton key={i} />
             ))}
@@ -362,7 +362,7 @@ export default function AllMentors({ limit }: AllMentorsProps) {
 
         {/* Grid */}
         {!loading && !error && displayMentors.length > 0 && (
-          <div className="mt-10 grid auto-rows-fr items-stretch gap-6 py-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid auto-rows-fr items-stretch gap-6 py-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
             {displayMentors.map((tutor, i) => (
               <MentorCard
                 key={tutor.id}

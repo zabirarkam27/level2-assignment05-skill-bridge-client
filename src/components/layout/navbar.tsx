@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Menu } from "lucide-react";
+import { LayoutDashboard, LogOut, Menu, UserCircle } from "lucide-react";
 import { useSessionContext } from "@/context/SessionContext";
 
 import { cn } from "@/lib/utils";
@@ -26,6 +26,14 @@ import { useLogout } from "@/lib/logout";
 import { getAvatarUrl } from "@/lib/avatar";
 import NotificationBell from "@/components/notifications/NotificationBell";
 import GlobalSearch from "@/components/search/GlobalSearch";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface MenuItem {
   title: string;
@@ -39,14 +47,28 @@ interface NavbarProps {
 export function Navbar({ className }: NavbarProps) {
   const { user, loading, refetch } = useSessionContext();
   const logout = useLogout();
+  const dashboardUrl =
+    user?.role === "ADMIN"
+      ? "/admin"
+      : user?.role === "TUTOR"
+        ? "/tutor/dashboard"
+        : "/dashboard";
+  const profileUrl =
+    user?.role === "ADMIN"
+      ? "/admin/profile"
+      : user?.role === "TUTOR"
+        ? "/tutor/profile"
+        : "/dashboard/profile";
 
   const menu: MenuItem[] = [
     { title: "Home", url: "/" },
     { title: "Courses", url: "/courses" },
     { title: "Mentors", url: "/mentors" },
+    { title: "About", url: "/about" },
+    { title: "Blog", url: "/blog" },
     { title: "Testimonials", url: "/testimonials" },
     { title: "Contact Us", url: "/contact" },
-    ...(user ? [{ title: "Dashboard", url: "/dashboard" }] : []),
+    ...(user ? [{ title: "Dashboard", url: dashboardUrl }] : []),
   ];
 
   if (loading) {
@@ -118,25 +140,58 @@ export function Navbar({ className }: NavbarProps) {
             </div>
             {!loading && user ? (
               <>
-                <NotificationBell />
-                <Link href="/dashboard">
-                  <Image
-                    src={getAvatarUrl(user.image)}
-                    alt="profile"
-                    width={36}
-                    height={36}
-                    className="rounded-full border cursor-pointer"
-                  />
-                </Link>
-
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => logout(refetch)}
-                  className=""
-                >
-                  Logout
-                </Button>
+                <div className="hidden xl:block">
+                  <NotificationBell />
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      className="flex h-10 items-center gap-2 rounded-full border bg-background px-1.5 pr-3 text-left text-sm transition-colors hover:bg-muted"
+                      aria-label="Open profile menu"
+                    >
+                      <Image
+                        src={getAvatarUrl(user.image)}
+                        alt={user.name || "Profile"}
+                        width={32}
+                        height={32}
+                        className="h-8 w-8 rounded-full object-cover"
+                      />
+                      <span className="hidden max-w-28 truncate font-medium xl:inline">
+                        {user.name}
+                      </span>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-64">
+                    <DropdownMenuLabel>
+                      <span className="block truncate">{user.name}</span>
+                      <span className="block truncate text-xs font-normal text-muted-foreground">
+                        {user.email}
+                      </span>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href={dashboardUrl}>
+                        <LayoutDashboard className="h-4 w-4" />
+                        Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href={profileUrl}>
+                        <UserCircle className="h-4 w-4" />
+                        Profile
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      variant="destructive"
+                      onClick={() => logout(refetch)}
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </>
             ) : (
               <>
@@ -158,7 +213,9 @@ export function Navbar({ className }: NavbarProps) {
                 </Button>
               </>
             )}
-            <ModeToggle />
+            <div className="hidden xl:block">
+              <ModeToggle />
+            </div>
           </div>
         </nav>
 
@@ -177,8 +234,10 @@ export function Navbar({ className }: NavbarProps) {
           <div className="flex items-center gap-2">
             {!loading && user && (
               <>
-                <NotificationBell />
-                <Link href="/dashboard" aria-label="Open dashboard">
+                <div className="lg:hidden">
+                  <NotificationBell />
+                </div>
+                <Link href={dashboardUrl} aria-label="Open dashboard">
                   <Image
                     src={getAvatarUrl(user.image)}
                     alt="profile"
@@ -267,6 +326,17 @@ export function Navbar({ className }: NavbarProps) {
                 </div>
               </SheetContent>
             </Sheet>
+          </div>
+        </div>
+
+        {/* Medium action layer */}
+        <div className="hidden border-t border-border/70 py-3 lg:flex xl:hidden">
+          <div className="flex w-full items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <GlobalSearch />
+            </div>
+            {!loading && user && <NotificationBell />}
+            <ModeToggle />
           </div>
         </div>
       </div>

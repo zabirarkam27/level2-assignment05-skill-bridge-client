@@ -217,7 +217,7 @@ export default function StudentReviewsPage() {
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div>
-              <label className="block text-sm font-medium mb-1.5">
+              <label htmlFor="review-booking" className="block text-sm font-medium mb-1.5">
                 Select Completed Session
               </label>
               {reviewableBookings.length === 0 ? (
@@ -227,6 +227,7 @@ export default function StudentReviewsPage() {
                 </p>
               ) : (
                 <select
+                  id="review-booking"
                   value={selectedBookingId}
                   onChange={(e) => setSelectedBookingId(e.target.value)}
                   className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#611f69]/40"
@@ -246,10 +247,11 @@ export default function StudentReviewsPage() {
               <StarSelector value={rating} onChange={setRating} />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1.5">
+              <label htmlFor="review-comment" className="block text-sm font-medium mb-1.5">
                 Comment
               </label>
               <Textarea
+                id="review-comment"
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Share your experience..."

@@ -110,10 +110,11 @@ export default function TutorProfilePage() {
 
         {/* Bio */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+          <label htmlFor="tutor-bio" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
             Bio
           </label>
           <Textarea
+            id="tutor-bio"
             value={profile.bio}
             onChange={(e) => setProfile((p) => ({ ...p, bio: e.target.value }))}
             placeholder="Tell students about yourself, your teaching style, experience..."
@@ -123,12 +124,13 @@ export default function TutorProfilePage() {
 
         {/* Price */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+          <label htmlFor="tutor-hourly-rate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
             Hourly Rate (৳)
           </label>
           <div className="relative">
             <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <Input
+              id="tutor-hourly-rate"
               type="number"
               value={profile.price}
               onChange={(e) => setProfile((p) => ({ ...p, price: Number(e.target.value) }))}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Booking, BookingStatus } from "@/types/routes.type";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,11 @@ import {
   hasSessionStarted,
   isBookingPaymentPaid,
 } from "@/lib/booking-rules";
+import {
+  DataListControls,
+  SortDirection,
+} from "@/components/data-list/DataListControls";
+import { compareValues, paginateItems } from "@/lib/data-list";
 
 const statusVariant: Record<
   BookingStatus,
@@ -25,12 +30,24 @@ const statusVariant: Record<
   CANCELLED: "destructive",
 };
 
+const bookingSortOptions = [
+  { label: "Session Date", value: "dateTime" },
+  { label: "Status", value: "status" },
+  { label: "Student", value: "student" },
+  { label: "Tutor", value: "tutor" },
+  { label: "Course", value: "course" },
+];
+
 export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<BookingStatus | "ALL">("ALL");
   const [actionId, setActionId] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState("dateTime");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -50,17 +67,45 @@ export default function AdminBookingsPage() {
     fetchBookings();
   }, []);
 
-  const filtered = bookings
-    .filter((b) => filter === "ALL" || b.status === filter)
-    .filter((b) => {
-      const q = search.toLowerCase();
-      return (
-        b.tutor?.user.name?.toLowerCase().includes(q) ||
-        b.student?.name?.toLowerCase().includes(q) ||
-        b.course?.title?.toLowerCase().includes(q) ||
-        b.course?.category?.name?.toLowerCase().includes(q)
-      );
-    });
+  useEffect(() => {
+    setPage(1);
+  }, [search, filter, sortBy, sortDirection, pageSize]);
+
+  const filtered = useMemo(
+    () =>
+      bookings
+        .filter((b) => filter === "ALL" || b.status === filter)
+        .filter((b) => {
+          const q = search.toLowerCase();
+          return (
+            b.tutor?.user.name?.toLowerCase().includes(q) ||
+            b.student?.name?.toLowerCase().includes(q) ||
+            b.course?.title?.toLowerCase().includes(q) ||
+            b.course?.category?.name?.toLowerCase().includes(q)
+          );
+        }),
+    [bookings, filter, search],
+  );
+
+  const sortedBookings = useMemo(
+    () =>
+      [...filtered].sort((first, second) => {
+        const getValue = (booking: Booking) => {
+          if (sortBy === "status") return booking.status;
+          if (sortBy === "student") return booking.student?.name;
+          if (sortBy === "tutor") return booking.tutor?.user.name;
+          if (sortBy === "course") return booking.course?.title;
+          return new Date(booking.dateTime);
+        };
+
+        return compareValues(getValue(first), getValue(second), sortDirection);
+      }),
+    [filtered, sortBy, sortDirection],
+  );
+  const paginatedBookings = useMemo(
+    () => paginateItems(sortedBookings, page, pageSize),
+    [sortedBookings, page, pageSize],
+  );
 
   const updateStatus = async (
     booking: Booking,
@@ -144,6 +189,23 @@ export default function AdminBookingsPage() {
         ))}
       </div>
 
+      {!loading && (
+        <div className="mb-5">
+          <DataListControls
+            totalItems={sortedBookings.length}
+            page={page}
+            pageSize={pageSize}
+            sortBy={sortBy}
+            sortDirection={sortDirection}
+            sortOptions={bookingSortOptions}
+            onPageChange={setPage}
+            onPageSizeChange={setPageSize}
+            onSortByChange={setSortBy}
+            onSortDirectionChange={setSortDirection}
+          />
+        </div>
+      )}
+
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
         {loading ? (
           <div className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -157,14 +219,14 @@ export default function AdminBookingsPage() {
               </div>
             ))}
           </div>
-        ) : filtered.length === 0 ? (
+        ) : sortedBookings.length === 0 ? (
           <div className="text-center py-16 text-gray-400">
             <BookOpen className="w-10 h-10 mx-auto mb-2 opacity-40" />
             <p className="text-sm">No bookings found</p>
           </div>
         ) : (
           <div className="divide-y divide-gray-100 dark:divide-gray-700">
-            {filtered.map((booking, i) => {
+            {paginatedBookings.map((booking, i) => {
               const paymentPaid = isBookingPaymentPaid(booking);
               const confirmAllowed = canConfirmBooking(booking);
               const completeAllowed = canCompleteBooking(booking);

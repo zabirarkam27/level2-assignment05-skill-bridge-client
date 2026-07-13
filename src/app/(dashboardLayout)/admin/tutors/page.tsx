@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AppUser } from "@/types/routes.type";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ import {
   Plus,
   Copy,
   Check,
+  Search,
 } from "lucide-react";
 import {
   Dialog,
@@ -30,6 +31,11 @@ import Image from "next/image";
 import { getAvatarUrl } from "@/lib/avatar";
 import CategorySubjectPicker from "@/components/CategorySubjectPicker";
 import ConfirmActionDialog from "@/components/ConfirmActionDialog";
+import {
+  DataListControls,
+  SortDirection,
+} from "@/components/data-list/DataListControls";
+import { compareValues, paginateItems } from "@/lib/data-list";
 
 const emptyForm = {
   name: "",
@@ -38,6 +44,13 @@ const emptyForm = {
   subjects: [] as string[],
   price: "",
 };
+
+const tutorSortOptions = [
+  { label: "Applied Date", value: "createdAt" },
+  { label: "Name", value: "name" },
+  { label: "Email", value: "email" },
+  { label: "Price", value: "price" },
+];
 
 export default function AdminTutorRequestsPage() {
   const [tutors, setTutors] = useState<AppUser[]>([]);
@@ -56,6 +69,11 @@ export default function AdminTutorRequestsPage() {
   // password reveal dialog
   const [generatedPassword, setGeneratedPassword] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const fetchPending = async () => {
     try {
@@ -73,6 +91,46 @@ export default function AdminTutorRequestsPage() {
   };
 
   useEffect(() => { fetchPending(); }, []);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, sortBy, sortDirection, pageSize]);
+
+  const filteredTutors = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
+    if (!query) return tutors;
+
+    return tutors.filter((tutor) =>
+      [
+        tutor.name,
+        tutor.email,
+        tutor.tutorProfile?.bio,
+        ...(tutor.tutorProfile?.subjects ?? []),
+      ]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(query)),
+    );
+  }, [tutors, search]);
+
+  const sortedTutors = useMemo(
+    () =>
+      [...filteredTutors].sort((first, second) => {
+        const getValue = (tutor: AppUser) => {
+          if (sortBy === "name") return tutor.name;
+          if (sortBy === "email") return tutor.email;
+          if (sortBy === "price") return tutor.tutorProfile?.price ?? 0;
+          return new Date(tutor.createdAt ?? 0);
+        };
+
+        return compareValues(getValue(first), getValue(second), sortDirection);
+      }),
+    [filteredTutors, sortBy, sortDirection],
+  );
+  const paginatedTutors = useMemo(
+    () => paginateItems(sortedTutors, page, pageSize),
+    [sortedTutors, page, pageSize],
+  );
 
   const handleApprove = async (userId: string) => {
     setUpdating(userId);
@@ -172,6 +230,32 @@ export default function AdminTutorRequestsPage() {
         </Button>
       </div>
 
+      <div className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="relative w-full lg:max-w-xs">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Filter tutor requests..."
+            className="pl-9"
+          />
+        </div>
+        {!loading && (
+          <DataListControls
+            totalItems={sortedTutors.length}
+            page={page}
+            pageSize={pageSize}
+            sortBy={sortBy}
+            sortDirection={sortDirection}
+            sortOptions={tutorSortOptions}
+            onPageChange={setPage}
+            onPageSizeChange={setPageSize}
+            onSortByChange={setSortBy}
+            onSortDirectionChange={setSortDirection}
+          />
+        )}
+      </div>
+
       {/* Pending list */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
         {loading ? (
@@ -187,7 +271,7 @@ export default function AdminTutorRequestsPage() {
               </div>
             ))}
           </div>
-        ) : tutors.length === 0 ? (
+        ) : sortedTutors.length === 0 ? (
           <div className="text-center py-20 text-gray-400">
             <UserCheck className="w-12 h-12 mx-auto mb-3 opacity-30" />
             <p className="text-sm font-medium">No pending tutor applications</p>
@@ -195,7 +279,7 @@ export default function AdminTutorRequestsPage() {
           </div>
         ) : (
           <div className="divide-y divide-gray-100 dark:divide-gray-700">
-            {tutors.map((tutor, i) => (
+            {paginatedTutors.map((tutor, i) => (
               <motion.div
                 key={tutor.id}
                 initial={{ opacity: 0 }}

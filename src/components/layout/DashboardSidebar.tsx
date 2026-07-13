@@ -20,6 +20,7 @@ import {
   CreditCard,
   Award,
   Heart,
+  MessageSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLogout } from "@/lib/logout";
@@ -63,6 +64,11 @@ function getNavItems(role?: string): NavItem[] {
       {
         title: "My Courses",
         href: "/tutor/courses",
+        icon: <BookOpen className="w-4 h-4" />,
+      },
+      {
+        title: "Blogs",
+        href: "/tutor/blogs",
         icon: <BookOpen className="w-4 h-4" />,
       },
       {
@@ -113,6 +119,21 @@ function getNavItems(role?: string): NavItem[] {
         title: "Courses",
         href: "/admin/courses",
         icon: <BookOpen className="w-4 h-4" />,
+      },
+      {
+        title: "Blogs",
+        href: "/admin/blogs",
+        icon: <BookOpen className="w-4 h-4" />,
+      },
+      {
+        title: "Contact Messages",
+        href: "/admin/contact",
+        icon: <MessageSquare className="w-4 h-4" />,
+      },
+      {
+        title: "Profile",
+        href: "/admin/profile",
+        icon: <User className="w-4 h-4" />,
       },
     ];
   }

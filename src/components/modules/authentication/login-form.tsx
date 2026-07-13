@@ -16,6 +16,7 @@ import {
   FieldDescription,
   FieldError,
   FieldGroup,
+  FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
@@ -27,17 +28,20 @@ import { useRouter } from "next/navigation";
 import { useSessionContext } from "@/context/SessionContext";
 import { Eye, EyeOff } from "lucide-react";
 import { UserRole } from "@/types/routes.type";
+import { getDashboardPath, getSocialAuthCallbackUrl } from "@/lib/auth-redirect";
 
 const formSchema = z.object({
   email: z.email(),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-function getDashboardPath(role?: UserRole) {
-  if (role === "ADMIN") return "/admin";
-  if (role === "TUTOR") return "/tutor/dashboard";
-  return "/";
-}
+const demoAccounts = [
+  {
+    label: "Admin demo",
+    email: "admin@skillbridge.com",
+    password: "admin1234",
+  },
+];
 
 async function getLoggedInUserRole() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/get-session`, {
@@ -94,11 +98,18 @@ export function LoginForm({
   const params = useSearchParams();
   const verified = params.get("verified");
 
+  const fillDemoAccount = (account: (typeof demoAccounts)[number]) => {
+    form.setFieldValue("email", account.email);
+    form.setFieldValue("password", account.password);
+    toast.success(`${account.label} credentials filled`);
+  };
+
   const handleGoogleLogin = async () => {
     try {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: `${process.env.NEXT_PUBLIC_APP_URL}`,
+        callbackURL: getSocialAuthCallbackUrl(),
+        errorCallbackURL: `${getSocialAuthCallbackUrl()}?error=google`,
       });
     } catch {
       toast.error("Google login Failed");
@@ -140,8 +151,9 @@ export function LoginForm({
                     field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field data-invalid={invalid}>
+                      <FieldLabel htmlFor="login-email">Email</FieldLabel>
                       <Input
-                        id="email"
+                        id="login-email"
                         type="email"
                         placeholder="Email"
                         value={field.state.value}
@@ -164,9 +176,10 @@ export function LoginForm({
                     field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field data-invalid={invalid}>
+                      <FieldLabel htmlFor="login-password">Password</FieldLabel>
                       <div className="relative">
                         <Input
-                          id="password"
+                          id="login-password"
                           type={showPassword ? "text" : "password"}
                           placeholder="Enter your password"
                           value={field.state.value}
@@ -200,6 +213,19 @@ export function LoginForm({
           >
             {form.state.isSubmitting ? "Logging in..." : "Login"}
           </Button>
+          <div className="grid w-full gap-2">
+            {demoAccounts.map((account) => (
+              <Button
+                key={account.email}
+                type="button"
+                variant="secondary"
+                onClick={() => fillDemoAccount(account)}
+                className="w-full"
+              >
+                Use {account.label}
+              </Button>
+            ))}
+          </div>
           <Button
             onClick={handleGoogleLogin}
             variant="outline"

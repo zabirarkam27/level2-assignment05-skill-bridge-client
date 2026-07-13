@@ -61,11 +61,15 @@ export default function ChangePassword() {
       </h2>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+        <label
+          htmlFor="current-password"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+        >
           Current Password
         </label>
         <div className="relative">
           <Input
+            id="current-password"
             type={showCurrent ? "text" : "password"}
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
@@ -87,11 +91,15 @@ export default function ChangePassword() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+        <label
+          htmlFor="new-password"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+        >
           New Password
         </label>
         <div className="relative">
           <Input
+            id="new-password"
             type={showNew ? "text" : "password"}
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
@@ -113,11 +121,15 @@ export default function ChangePassword() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+        <label
+          htmlFor="confirm-new-password"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+        >
           Confirm New Password
         </label>
         <div className="relative">
           <Input
+            id="confirm-new-password"
             type={showConfirm ? "text" : "password"}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}

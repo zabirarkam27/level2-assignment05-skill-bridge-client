@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { CreditCard, Download, Eye, Printer, ReceiptText } from "lucide-react";
+import { CreditCard, Download, Eye, Printer, ReceiptText, Search } from "lucide-react";
 import { PaymentHistoryItem } from "@/types/routes.type";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DataListControls,
+  SortDirection,
+} from "@/components/data-list/DataListControls";
+import { compareValues, paginateItems } from "@/lib/data-list";
 
 type PaymentHistoryProps = {
   role: "student" | "tutor" | "admin";
@@ -26,6 +31,14 @@ const statusVariant: Record<
   FAILED: "destructive",
   CANCELLED: "destructive",
 };
+
+const paymentSortOptions = [
+  { label: "Newest", value: "createdAt" },
+  { label: "Amount", value: "amount" },
+  { label: "Status", value: "status" },
+  { label: "Course", value: "course" },
+  { label: "Transaction", value: "transactionId" },
+];
 
 function formatAmount(payment: PaymentHistoryItem) {
   return `${payment.currency.toUpperCase()} ${payment.amount}`;
@@ -51,6 +64,11 @@ export default function PaymentHistory({ role }: PaymentHistoryProps) {
   const [downloading, setDownloading] = useState<string | null>(null);
   const [selectedInvoice, setSelectedInvoice] =
     useState<PaymentHistoryItem | null>(null);
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
     const fetchPayments = async () => {
@@ -72,6 +90,51 @@ export default function PaymentHistory({ role }: PaymentHistoryProps) {
 
     fetchPayments();
   }, []);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, sortBy, sortDirection, pageSize]);
+
+  const filteredPayments = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
+    if (!query) return payments;
+
+    return payments.filter((payment) =>
+      [
+        payment.transactionId,
+        payment.status,
+        payment.course?.title,
+        payment.course?.category?.name,
+        payment.student?.name,
+        payment.student?.email,
+        payment.tutor?.user?.name,
+        payment.tutor?.user?.email,
+      ]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(query)),
+    );
+  }, [payments, search]);
+
+  const sortedPayments = useMemo(
+    () =>
+      [...filteredPayments].sort((first, second) => {
+        const getValue = (payment: PaymentHistoryItem) => {
+          if (sortBy === "amount") return payment.amount;
+          if (sortBy === "status") return payment.status;
+          if (sortBy === "course") return payment.course?.title;
+          if (sortBy === "transactionId") return payment.transactionId;
+          return new Date(payment.createdAt);
+        };
+
+        return compareValues(getValue(first), getValue(second), sortDirection);
+      }),
+    [filteredPayments, sortBy, sortDirection],
+  );
+  const paginatedPayments = useMemo(
+    () => paginateItems(sortedPayments, page, pageSize),
+    [sortedPayments, page, pageSize],
+  );
 
   const downloadInvoice = async (payment: PaymentHistoryItem) => {
     setDownloading(payment.id);
@@ -226,6 +289,32 @@ export default function PaymentHistory({ role }: PaymentHistoryProps) {
         </p>
       </div>
 
+      <div className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="relative w-full lg:max-w-xs">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Filter payments, users, transaction..."
+            className="h-10 w-full rounded-md border border-input bg-background py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#611f69]/40"
+          />
+        </div>
+        {!loading && (
+          <DataListControls
+            totalItems={sortedPayments.length}
+            page={page}
+            pageSize={pageSize}
+            sortBy={sortBy}
+            sortDirection={sortDirection}
+            sortOptions={paymentSortOptions}
+            onPageChange={setPage}
+            onPageSizeChange={setPageSize}
+            onSortByChange={setSortBy}
+            onSortDirectionChange={setSortDirection}
+          />
+        )}
+      </div>
+
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((item) => (
@@ -235,14 +324,14 @@ export default function PaymentHistory({ role }: PaymentHistoryProps) {
             />
           ))}
         </div>
-      ) : payments.length === 0 ? (
+      ) : sortedPayments.length === 0 ? (
         <div className="rounded-xl border border-dashed border-gray-200 py-16 text-center text-gray-400 dark:border-gray-700">
           <ReceiptText className="mx-auto mb-3 h-10 w-10 opacity-50" />
           <p className="text-sm">No payment records found.</p>
         </div>
       ) : (
         <div className="space-y-3">
-          {payments.map((payment) => (
+          {paginatedPayments.map((payment) => (
             <div
               key={payment.id}
               className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800"

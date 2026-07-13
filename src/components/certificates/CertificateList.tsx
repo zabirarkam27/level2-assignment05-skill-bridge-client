@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   Award,
@@ -8,6 +8,7 @@ import {
   ExternalLink,
   Eye,
   Printer,
+  Search,
   Share2,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -21,10 +22,22 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Certificate } from "@/types/routes.type";
+import {
+  DataListControls,
+  SortDirection,
+} from "@/components/data-list/DataListControls";
+import { compareValues, paginateItems } from "@/lib/data-list";
 
 type CertificateListProps = {
   mode: "student" | "admin";
 };
+
+const certificateSortOptions = [
+  { label: "Issued Date", value: "issuedAt" },
+  { label: "Course", value: "course" },
+  { label: "Student", value: "student" },
+  { label: "Certificate No", value: "certificateNo" },
+];
 
 const formatDate = (value: string) =>
   new Date(value).toLocaleDateString("en-BD", {
@@ -168,6 +181,11 @@ export default function CertificateList({ mode }: CertificateListProps) {
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [selectedCertificate, setSelectedCertificate] =
     useState<Certificate | null>(null);
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState("issuedAt");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
     const fetchCertificates = async () => {
@@ -187,6 +205,47 @@ export default function CertificateList({ mode }: CertificateListProps) {
 
     fetchCertificates();
   }, []);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, sortBy, sortDirection, pageSize]);
+
+  const filteredCertificates = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
+    if (!query) return certificates;
+
+    return certificates.filter((certificate) =>
+      [
+        certificate.certificateNo,
+        certificate.course?.title,
+        certificate.course?.category?.name,
+        certificate.student?.name,
+        certificate.student?.email,
+      ]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(query)),
+    );
+  }, [certificates, search]);
+
+  const sortedCertificates = useMemo(
+    () =>
+      [...filteredCertificates].sort((first, second) => {
+        const getValue = (certificate: Certificate) => {
+          if (sortBy === "course") return certificate.course?.title;
+          if (sortBy === "student") return certificate.student?.name;
+          if (sortBy === "certificateNo") return certificate.certificateNo;
+          return new Date(certificate.issuedAt);
+        };
+
+        return compareValues(getValue(first), getValue(second), sortDirection);
+      }),
+    [filteredCertificates, sortBy, sortDirection],
+  );
+  const paginatedCertificates = useMemo(
+    () => paginateItems(sortedCertificates, page, pageSize),
+    [sortedCertificates, page, pageSize],
+  );
 
   const downloadCertificate = async (certificate: Certificate) => {
     setDownloadingId(certificate.id);
@@ -342,6 +401,32 @@ export default function CertificateList({ mode }: CertificateListProps) {
         </div>
       </div>
 
+      <div className="mb-5 flex flex-col gap-3 rounded-xl border border-gray-100 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800 lg:flex-row lg:items-center lg:justify-between">
+        <div className="relative w-full lg:max-w-xs">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Filter certificates..."
+            className="h-10 w-full rounded-md border border-input bg-background py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#611f69]/40"
+          />
+        </div>
+        {!loading && (
+          <DataListControls
+            totalItems={sortedCertificates.length}
+            page={page}
+            pageSize={pageSize}
+            sortBy={sortBy}
+            sortDirection={sortDirection}
+            sortOptions={certificateSortOptions}
+            onPageChange={setPage}
+            onPageSizeChange={setPageSize}
+            onSortByChange={setSortBy}
+            onSortDirectionChange={setSortDirection}
+          />
+        )}
+      </div>
+
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((item) => (
@@ -351,7 +436,7 @@ export default function CertificateList({ mode }: CertificateListProps) {
             />
           ))}
         </div>
-      ) : certificates.length === 0 ? (
+      ) : sortedCertificates.length === 0 ? (
         <div className="rounded-xl border border-dashed border-gray-200 bg-white px-6 py-16 text-center text-gray-400 dark:border-gray-700 dark:bg-gray-800">
           <Award className="mx-auto mb-3 h-12 w-12 opacity-40" />
           <p className="text-sm">
@@ -362,7 +447,7 @@ export default function CertificateList({ mode }: CertificateListProps) {
         </div>
       ) : (
         <div className="space-y-3">
-          {certificates.map((certificate) => (
+          {paginatedCertificates.map((certificate) => (
             <div
               key={certificate.id}
               className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
