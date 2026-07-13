@@ -523,29 +523,75 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="px-4 py-14 sm:px-6">
-        <div className="mx-auto grid max-w-7xl gap-6 rounded-2xl bg-[#611f69] p-6 text-white dark:bg-[#c084fc] dark:text-black md:grid-cols-[1fr_auto] md:items-center md:p-10">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-wide opacity-80">
-              Ready to learn?
-            </p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight">
-              Book your next focused learning session with SkillBridge.
-            </h2>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Link
-              href="/mentors"
-              className="inline-flex h-11 items-center justify-center rounded-xl bg-white px-5 text-sm font-semibold text-[#611f69] dark:bg-black dark:text-white"
-            >
-              Browse mentors
-            </Link>
-            <Link
-              href="/contact"
-              className="inline-flex h-11 items-center justify-center rounded-xl border border-white/35 px-5 text-sm font-semibold"
-            >
-              Contact support
-            </Link>
+      <section className="px-4 py-20 sm:px-6">
+        <div className="mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-[#611f69] text-white shadow-2xl shadow-[#611f69]/20 dark:bg-[#c084fc] dark:text-black dark:shadow-[#c084fc]/10">
+          <div className="grid gap-10 p-6 md:p-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:p-14">
+            <div>
+              <p className="inline-flex rounded-full bg-white/12 px-3 py-1 text-xs font-bold uppercase tracking-wide ring-1 ring-white/20 dark:bg-black/10 dark:ring-black/10">
+                Ready to learn?
+              </p>
+              <h2 className="mt-5 max-w-3xl text-4xl font-bold leading-tight tracking-tight md:text-5xl">
+                Start your next focused learning session with a mentor you can
+                trust.
+              </h2>
+              <p className="mt-5 max-w-2xl text-base leading-8 text-white/80 dark:text-black/70 md:text-lg">
+                Choose a tutor, pay securely, get confirmation, and keep your
+                invoices, certificates, reviews, and session records organized
+                from one dashboard.
+              </p>
+
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Link
+                  href="/mentors"
+                  className="inline-flex h-12 items-center justify-center rounded-xl bg-white px-6 text-sm font-bold text-[#611f69] transition-colors hover:bg-gray-100 dark:bg-black dark:text-white dark:hover:bg-gray-900"
+                >
+                  Browse mentors
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+                <Link
+                  href="/courses"
+                  className="inline-flex h-12 items-center justify-center rounded-xl border border-white/35 px-6 text-sm font-bold transition-colors hover:bg-white/10 dark:border-black/20 dark:hover:bg-black/10"
+                >
+                  Explore courses
+                </Link>
+              </div>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              {[
+                {
+                  icon: CreditCard,
+                  title: "Secure payment",
+                  text: "Pay before confirmation.",
+                },
+                {
+                  icon: Users,
+                  title: "Trusted tutors",
+                  text: "Choose mentors by skill.",
+                },
+                {
+                  icon: ShieldCheck,
+                  title: "Verified records",
+                  text: "Invoices and history stay saved.",
+                },
+                {
+                  icon: CheckCircle2,
+                  title: "Clear workflow",
+                  text: "Book, confirm, complete, review.",
+                },
+              ].map(({ icon: Icon, title, text }) => (
+                <div
+                  key={title}
+                  className="rounded-2xl bg-white/12 p-5 ring-1 ring-white/15 backdrop-blur dark:bg-black/10 dark:ring-black/10"
+                >
+                  <Icon className="h-6 w-6" />
+                  <h3 className="mt-4 font-bold">{title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-white/75 dark:text-black/65">
+                    {text}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>

@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
-  ArrowRight,
   ExternalLink,
   Github,
   Linkedin,
@@ -64,28 +63,7 @@ export function Footer({ className }: FooterProps) {
       )}
     >
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-        <div className="rounded-3xl bg-[#611f69] p-6 text-white dark:bg-[#c084fc] dark:text-black md:p-8">
-          <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-wide opacity-80">
-                SkillBridge
-              </p>
-              <h2 className="mt-2 max-w-2xl text-2xl font-bold tracking-tight md:text-3xl">
-                Learn with trusted mentors and keep every session record in one
-                place.
-              </h2>
-            </div>
-            <Link
-              href="/mentors"
-              className="inline-flex h-11 items-center justify-center rounded-xl bg-white px-5 text-sm font-semibold text-[#611f69] transition-colors hover:bg-gray-100 dark:bg-black dark:text-white dark:hover:bg-gray-900"
-            >
-              Find a mentor
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </div>
-        </div>
-
-        <div className="grid gap-10 py-12 lg:grid-cols-[1.15fr_0.85fr_1fr]">
+        <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr_1fr]">
           <div>
             <Link href="/" className="inline-flex items-center gap-2">
               <Image
